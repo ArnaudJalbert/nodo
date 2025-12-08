@@ -1,9 +1,9 @@
 """Invalid state transition error exception."""
 
-from nodo.domain.exceptions.domain_exception import DomainException
+from nodo.domain.exceptions.domain_exception import DomainError
 
 
-class InvalidStateTransitionError(DomainException):
+class InvalidStateTransitionError(DomainError):
     """Raised when attempting an invalid status change.
 
     This exception is raised when trying to transition a download

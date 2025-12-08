@@ -1,9 +1,9 @@
 """Validation error exception."""
 
-from nodo.domain.exceptions.domain_exception import DomainException
+from nodo.domain.exceptions.domain_exception import DomainError
 
 
-class ValidationError(DomainException):
+class ValidationError(DomainError):
     """Raised when input validation fails.
 
     This exception is raised when data does not meet the required

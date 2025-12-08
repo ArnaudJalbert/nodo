@@ -1,9 +1,9 @@
 """File system error exception."""
 
-from nodo.domain.exceptions.domain_exception import DomainException
+from nodo.domain.exceptions.domain_exception import DomainError
 
 
-class FileSystemError(DomainException):
+class FileSystemError(DomainError):
     """Raised when file system operations fail.
 
     This exception is raised when file system operations such as

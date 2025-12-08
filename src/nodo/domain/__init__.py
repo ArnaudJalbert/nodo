@@ -9,7 +9,7 @@ from nodo.domain.entities import (
 from nodo.domain.exceptions import (
     AggregatorError,
     AggregatorTimeoutError,
-    DomainException,
+    DomainError,
     DownloadNotFoundError,
     DuplicateDownloadError,
     FileSystemError,
@@ -33,7 +33,7 @@ __all__ = [
     # Exceptions
     "AggregatorError",
     "AggregatorTimeoutError",
-    "DomainException",
+    "DomainError",
     "DownloadNotFoundError",
     "DuplicateDownloadError",
     "FileSystemError",
