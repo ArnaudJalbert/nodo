@@ -35,16 +35,16 @@ Nodo is a CLI-based torrent download manager built with Clean Architecture princ
 ## Phase 2: Application Layer
 *Depends only on domain layer*
 
-### 2.1 Interfaces (ABCs)
-- [ ] `IDownloadRepository` - Download persistence
-- [ ] `IUserPreferencesRepository` - Preferences persistence
-- [ ] `IAggregatorService` - Torrent search service
-- [ ] `ITorrentClient` - Torrent client operations
+### 2.1 Interfaces (ABCs) ✅
+- [x] `IDownloadRepository` - Download persistence
+- [x] `IUserPreferencesRepository` - Preferences persistence
+- [x] `IAggregatorService` - Torrent search service
+- [x] `ITorrentClient` - Torrent client operations
 
-### 2.2 Shared DTOs
-- [ ] `DownloadDTO` - Download data transfer object
-- [ ] `TorrentSearchResultDTO` - Search result DTO
-- [ ] `UserPreferencesDTO` - Preferences DTO
+### 2.2 Shared DTOs ✅
+- [x] `DownloadDTO` - Download data transfer object
+- [x] `TorrentSearchResultDTO` - Search result DTO
+- [x] `UserPreferencesDTO` - Preferences DTO
 
 ### 2.3 User Preferences Use Cases
 - [ ] `GetUserPreferences` - Load preferences
@@ -146,6 +146,7 @@ Nodo is a CLI-based torrent download manager built with Clean Architecture princ
 | 2025-12-08 | Phase 1.1 - Domain exceptions | Completed |
 | 2025-12-08 | Phase 1.2 - Value objects | Completed |
 | 2025-12-08 | Phase 1.3 - Entities | Completed |
+| 2025-12-08 | Phase 2.2 - Shared DTOs | Completed |
 
 ---
 

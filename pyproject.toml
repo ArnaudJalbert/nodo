@@ -1,6 +1,6 @@
 [project]
 name = "nodo"
-version = "0.2.0"
+version = "0.3.0"
 description = "Minimalist torrent download manager"
 readme = "README.md"
 requires-python = ">=3.13"
@@ -22,6 +22,9 @@ dev = [
     "pytest>=9.0.2",
     "pytest-cov>=7.0.0",
     "ruff>=0.14.8",
+    "mkdocs>=1.6.0",
+    "mkdocs-material>=9.5.0",
+    "mkdocstrings[python]>=0.24.0",
 ]
 
 # Testing configuration

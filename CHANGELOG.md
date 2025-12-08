@@ -5,7 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.3.0] 2025-12-08
+
+### Added
+
+- Application layer data transfer objects (DTOs)
+  - `DownloadDTO` - Data transfer object for Download entity
+  - `TorrentSearchResultDTO` - Data transfer object for TorrentSearchResult entity
+  - `UserPreferencesDTO` - Data transfer object for UserPreferences entity
+- Test suite for application layer DTOs
+  - Comprehensive tests for all DTOs with 100% coverage
+  - Tests for immutability, equality, and edge cases
 
 ## [0.2.0] - 2025-12-08
 
