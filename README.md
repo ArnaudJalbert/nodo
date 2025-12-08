@@ -100,6 +100,40 @@ uv run pytest --cov=src
 uv lock
 ```
 
+### Documentation
+
+The project documentation is built with MkDocs and available at [https://username.github.io/nodo](https://username.github.io/nodo).
+
+#### Viewing Documentation Locally
+
+```bash
+# Install dev dependencies (includes MkDocs)
+uv sync --dev
+
+# Serve documentation locally (builds and serves in one command)
+# Option 1: Using the console script (recommended)
+nodo-docs
+# Or with uv:
+uv run nodo-docs
+
+# Option 2: Using the shell script
+./scripts/docs.sh
+
+# Option 3: Using mkdocs directly
+uv run mkdocs serve
+```
+
+The documentation will be available at `http://127.0.0.1:8000`
+
+#### Building Documentation
+
+```bash
+# Build static site
+uv run mkdocs build
+
+# Output will be in the `site/` directory
+```
+
 ## Architecture
 
 Nodo follows Clean Architecture with four layers:

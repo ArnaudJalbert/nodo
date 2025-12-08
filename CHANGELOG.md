@@ -16,6 +16,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Test suite for application layer DTOs
   - Comprehensive tests for all DTOs with 100% coverage
   - Tests for immutability, equality, and edge cases
+- Documentation infrastructure with MkDocs
+  - Complete MkDocs setup with Material theme
+  - Comprehensive documentation structure:
+    - Getting started guide
+    - Architecture documentation (overview, domain, application, interface adapters, infrastructure)
+    - User guide (searching, downloading, preferences)
+    - Development guides (setup, testing, contributing)
+  - GitHub Actions workflow for automatic documentation deployment to GitHub Pages
+  - `nodo-docs` console script for local documentation server
+  - Shell script (`scripts/docs.sh`) for convenience
 
 ## [0.2.0] - 2025-12-08
 
