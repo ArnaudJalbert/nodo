@@ -38,8 +38,15 @@ It encapsulates and implements all of the use cases of the system. These use cas
 - ❌ We do NOT expect changes in this layer to affect the entities
 - ❌ We do NOT expect this layer to be affected by changes to externalities (database, UI, frameworks)
 - ✅ This layer is isolated from such concerns
-- ✅ Depends ONLY on domain layer interfaces (ABC)
+- ✅ Defines interfaces (ABCs) for repositories and external services
+- ✅ Use cases depend on these abstractions, not concrete implementations
 - ✅ Changes when operation of the application changes
+
+**What Lives Here:**
+- Interfaces (ABCs) for repositories (IDownloadRepository, IUserPreferencesRepository)
+- Interfaces (ABCs) for external services (IAggregatorService, ITorrentClient)
+- Use cases that orchestrate business logic
+- DTOs for input/output data transfer
 
 **Examples:**
 - If the details of a use-case change, then some code in this layer will certainly be affected
@@ -55,7 +62,7 @@ The software in this layer is a set of adapters that convert data from the forma
 
 **Key Points:**
 - ✅ Contains all data format conversion
-- ✅ Implements domain interfaces (ABC)
+- ✅ Implements application layer interfaces (ABCs)
 - ✅ Receives external dependencies via Protocol-typed constructors
 - ✅ No CLI code, no DI, no framework setup
 - ❌ No knowledge of infrastructure layer
