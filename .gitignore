@@ -17,3 +17,7 @@ htmlcov/
 
 # Claude Files
 .claude/
+
+# IDE files
+.vscode/
+.idea/
