@@ -17,16 +17,33 @@ P = ParamSpec("P")
 T = TypeVar("T")
 
 
-def updates_modified_date(func: Callable[P, T]) -> Callable[P, T]:
-    """Decorator that updates date_modified after method execution."""
+def updates_modified_date(
+    func: Callable[P, T] | None = None, *, only_when_changed: bool = False
+) -> Callable[P, T]:
+    """Decorator that updates date_modified after method execution.
 
-    @wraps(func)
-    def wrapper(self: "UserPreferences", *args: P.args, **kwargs: P.kwargs) -> T:
-        result = func(self, *args, **kwargs)
-        self.date_modified = datetime.now()
-        return result
+    Args:
+        func: The wrapped method.
+        only_when_changed: Whether to update date_modified only when the wrapped method
+            returns a truthy value indicating a mutation occurred.
+    """
 
-    return wrapper  # type: ignore[return-value]
+    def decorator(inner_func: Callable[P, T]) -> Callable[P, T]:
+        @wraps(inner_func)
+        def wrapper(self: "UserPreferences", *args: P.args, **kwargs: P.kwargs) -> T:
+            result = inner_func(self, *args, **kwargs)
+            should_update = True
+            if only_when_changed:
+                should_update = bool(result)
+            if should_update:
+                self.date_modified = datetime.now()
+            return result
+
+        return wrapper  # type: ignore[return-value]
+
+    if func is not None:
+        return decorator(func)
+    return decorator
 
 
 @dataclass(slots=True, kw_only=True)
@@ -69,45 +86,65 @@ class UserPreferences:
         """
         return cls(default_download_path=Path.home() / "Downloads")
 
-    @updates_modified_date
-    def add_favorite_path(self, path: Path) -> None:
+    @updates_modified_date(only_when_changed=True)
+    def add_favorite_path(self, path: Path) -> bool:
         """Add path to favorites if not already present.
 
         Args:
             path: The path to add to favorites.
+
+        Returns:
+            True if the path was added, False otherwise.
         """
         if path not in self.favorite_paths:
             self.favorite_paths.append(path)
+            return True
+        return False
 
-    @updates_modified_date
-    def remove_favorite_path(self, path: Path) -> None:
+    @updates_modified_date(only_when_changed=True)
+    def remove_favorite_path(self, path: Path) -> bool:
         """Remove path from favorites.
 
         Args:
             path: The path to remove from favorites.
+
+        Returns:
+            True if the path was removed, False otherwise.
         """
         if path in self.favorite_paths:
             self.favorite_paths.remove(path)
+            return True
+        return False
 
-    @updates_modified_date
-    def add_favorite_aggregator(self, source: AggregatorSource) -> None:
+    @updates_modified_date(only_when_changed=True)
+    def add_favorite_aggregator(self, source: AggregatorSource) -> bool:
         """Add aggregator to favorites if not already present.
 
         Args:
             source: The aggregator source to add.
+
+        Returns:
+            True if the aggregator was added, False otherwise.
         """
         if source not in self.favorite_aggregators:
             self.favorite_aggregators.append(source)
+            return True
+        return False
 
-    @updates_modified_date
-    def remove_favorite_aggregator(self, source: AggregatorSource) -> None:
+    @updates_modified_date(only_when_changed=True)
+    def remove_favorite_aggregator(self, source: AggregatorSource) -> bool:
         """Remove aggregator from favorites.
 
         Args:
             source: The aggregator source to remove.
+
+        Returns:
+            True if the aggregator was removed, False otherwise.
         """
         if source in self.favorite_aggregators:
             self.favorite_aggregators.remove(source)
+            return True
+        return False
 
     @updates_modified_date
     def update_default_path(self, path: Path) -> None:

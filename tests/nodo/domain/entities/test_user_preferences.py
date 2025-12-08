@@ -110,9 +110,12 @@ def test_user_preferences_add_duplicate_favorite_path_no_effect() -> None:
     """Adding duplicate path should not add it again."""
     prefs = UserPreferences(default_download_path=Path("/downloads"))
     prefs.add_favorite_path(Path("/movies"))
+    original_modified = prefs.date_modified
+    sleep(0.01)
     prefs.add_favorite_path(Path("/movies"))
 
     assert prefs.favorite_paths.count(Path("/movies")) == 1
+    assert prefs.date_modified == original_modified
 
 
 def test_user_preferences_remove_favorite_path() -> None:
@@ -139,9 +142,12 @@ def test_user_preferences_remove_favorite_path_updates_date_modified() -> None:
 def test_user_preferences_remove_nonexistent_path_no_error() -> None:
     """Removing nonexistent path should not raise error."""
     prefs = UserPreferences(default_download_path=Path("/downloads"))
+    original_modified = prefs.date_modified
+    sleep(0.01)
     prefs.remove_favorite_path(Path("/nonexistent"))
 
     assert Path("/nonexistent") not in prefs.favorite_paths
+    assert prefs.date_modified == original_modified
 
 
 # --- Favorite Aggregators ---
@@ -172,9 +178,12 @@ def test_user_preferences_add_duplicate_favorite_aggregator_no_effect() -> None:
     prefs = UserPreferences(default_download_path=Path("/downloads"))
     source = AggregatorSource(name="1337x")
     prefs.add_favorite_aggregator(source)
+    original_modified = prefs.date_modified
+    sleep(0.01)
     prefs.add_favorite_aggregator(source)
 
     assert len([a for a in prefs.favorite_aggregators if a == source]) == 1
+    assert prefs.date_modified == original_modified
 
 
 def test_user_preferences_remove_favorite_aggregator() -> None:
@@ -198,6 +207,17 @@ def test_user_preferences_remove_favorite_aggregator_updates_date_modified() -> 
     prefs.remove_favorite_aggregator(source)
 
     assert prefs.date_modified > original_modified
+
+
+def test_user_preferences_remove_nonexistent_favorite_aggregator_no_effect() -> None:
+    """Removing nonexistent favorite aggregator should not touch date_modified."""
+    prefs = UserPreferences(default_download_path=Path("/downloads"))
+    original_modified = prefs.date_modified
+    sleep(0.01)
+
+    prefs.remove_favorite_aggregator(AggregatorSource(name="1337x"))
+
+    assert prefs.date_modified == original_modified
 
 
 # --- Update Methods ---
