@@ -108,7 +108,7 @@ jobs:
         run: uv python install 3.13
 
       - name: Check lockfile is up to date
-        run: uv lock
+        run: uv lock --locked
 
   test:
     name: Test
