@@ -1,0 +1,42 @@
+[project]
+name = "nodo"
+version = "0.1.0"
+description = "Minimalist torrent download manager"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
+
+# Build system configuration
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build]
+include = ["src/nodo/**"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/nodo"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+    "pytest-cov>=7.0.0",
+    "ruff>=0.14.8",
+]
+
+# Testing configuration
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+extend-select = [
+    "E501", # line too long
+    "ANN", # flake8 type check
+    "N", # pep8 naming convention
+    "R", # pylint refactor rules
+    "I", # isort
+]
+ignore = []
