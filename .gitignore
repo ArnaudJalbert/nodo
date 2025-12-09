@@ -17,6 +17,7 @@ htmlcov/
 
 # Claude Files
 .claude/
+commit_message.txt
 
 # IDE files
 .vscode/

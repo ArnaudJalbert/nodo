@@ -33,11 +33,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `AddFavoriteAggregator` - Add favorite aggregator (returns name and added flag)
   - `RemoveFavoriteAggregator` - Remove favorite aggregator (returns name and removed flag)
 - Test suite for all user preferences use cases with 100% coverage
+- Download management use cases
+  - `ListDownloads` - List all downloads with filtering and sorting
+  - `AddDownload` - Add and start a new download
+  - `SearchTorrents` - Search torrents across multiple aggregators with deduplication
+- Application layer interfaces
+  - `IAggregatorServiceRegistry` - Interface for accessing aggregator services by name
+- Domain entity hashability
+  - `TorrentSearchResult` now implements `__hash__` and `__eq__` based on magnet link
+  - Enables set-based deduplication at the domain level
+- Test suite for download management use cases with 100% coverage
+
+### Changed
+
+- `SearchTorrents` use case now accepts `IAggregatorServiceRegistry` interface instead of dict
+  - Improves Clean Architecture compliance by depending on abstractions
+- `SearchTorrents` validation: empty `aggregator_names` list now raises `ValidationError`
+  - Only `None` triggers preference-based or all-available aggregator selection
+- Deduplication in `SearchTorrents` now uses set-based approach instead of manual function
+  - Leverages hashable `TorrentSearchResult` entity for efficient deduplication
 
 ### Removed
 
 - `UserPreferencesDTO` - Replaced by use case-specific inner Output classes
 - `user_preferences_mapper.py` - No longer needed with inner Output classes
+- `SearchTorrents._deduplicate_results()` method - Replaced with set-based deduplication
 
 
 ## [0.2.0] - 2025-12-08
