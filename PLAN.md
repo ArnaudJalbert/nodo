@@ -26,7 +26,7 @@ Nodo is a CLI-based torrent download manager built with Clean Architecture princ
 - [x] `DownloadStatus` - Enum (DOWNLOADING, COMPLETED, FAILED, PAUSED)
 
 ### 1.3 Entities ✅
-- [x] `TorrentSearchResult` - Ephemeral search result
+- [x] `TorrentSearchResult` - Ephemeral search result (hashable by magnet link)
 - [x] `Download` - Core persisted entity
 - [x] `UserPreferences` - Singleton preferences entity
 
@@ -40,6 +40,7 @@ Nodo is a CLI-based torrent download manager built with Clean Architecture princ
 - [x] `IUserPreferencesRepository` - Preferences persistence
 - [x] `IAggregatorService` - Torrent search service
 - [x] `ITorrentClient` - Torrent client operations
+- [x] `IAggregatorServiceRegistry` - Aggregator service registry interface
 
 ### 2.2 Shared DTOs ✅
 - [x] `DownloadDTO` - Download data transfer object
@@ -55,9 +56,9 @@ Nodo is a CLI-based torrent download manager built with Clean Architecture princ
 - [x] `RemoveFavoriteAggregator` - Remove favorite source
 
 ### 2.4 Download Management Use Cases
-- [ ] `SearchTorrents` - Search across aggregators
-- [ ] `AddDownload` - Add and start download
-- [ ] `ListDownloads` - List downloads with filtering
+- [x] `SearchTorrents` - Search across aggregators with deduplication
+- [x] `AddDownload` - Add and start download
+- [x] `ListDownloads` - List downloads with filtering and sorting
 - [ ] `GetDownloadStatus` - Get status and progress
 - [ ] `RemoveDownload` - Remove download
 - [ ] `PauseDownload` - Pause active download
@@ -148,6 +149,11 @@ Nodo is a CLI-based torrent download manager built with Clean Architecture princ
 | 2025-12-08 | Phase 1.3 - Entities | Completed |
 | 2025-12-08 | Phase 2.2 - Shared DTOs | Completed |
 | 2025-12-08 | Phase 2.3 - User Preferences Use Cases | Completed |
+| 2025-12-08 | Phase 2.4 - SearchTorrents use case | Completed |
+| 2025-12-08 | Phase 2.4 - AddDownload use case | Completed |
+| 2025-12-08 | Phase 2.4 - ListDownloads use case | Completed |
+| 2025-12-08 | Phase 2.1 - IAggregatorServiceRegistry interface | Completed |
+| 2025-12-08 | TorrentSearchResult hashability (set-based deduplication) | Completed |
 
 ---
 
