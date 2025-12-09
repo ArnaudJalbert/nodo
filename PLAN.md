@@ -46,13 +46,13 @@ Nodo is a CLI-based torrent download manager built with Clean Architecture princ
 - [x] `TorrentSearchResultDTO` - Search result DTO
 - [x] `UserPreferencesDTO` - Preferences DTO
 
-### 2.3 User Preferences Use Cases
-- [ ] `GetUserPreferences` - Load preferences
-- [ ] `UpdateUserPreferences` - Update settings
-- [ ] `AddFavoritePath` - Add favorite download location
-- [ ] `RemoveFavoritePath` - Remove favorite location
-- [ ] `AddFavoriteAggregator` - Add favorite source
-- [ ] `RemoveFavoriteAggregator` - Remove favorite source
+### 2.3 User Preferences Use Cases ✅
+- [x] `GetUserPreferences` - Load preferences
+- [x] `UpdateUserPreferences` - Update settings
+- [x] `AddFavoritePath` - Add favorite download location
+- [x] `RemoveFavoritePath` - Remove favorite location
+- [x] `AddFavoriteAggregator` - Add favorite source
+- [x] `RemoveFavoriteAggregator` - Remove favorite source
 
 ### 2.4 Download Management Use Cases
 - [ ] `SearchTorrents` - Search across aggregators
@@ -147,6 +147,7 @@ Nodo is a CLI-based torrent download manager built with Clean Architecture princ
 | 2025-12-08 | Phase 1.2 - Value objects | Completed |
 | 2025-12-08 | Phase 1.3 - Entities | Completed |
 | 2025-12-08 | Phase 2.2 - Shared DTOs | Completed |
+| 2025-12-08 | Phase 2.3 - User Preferences Use Cases | Completed |
 
 ---
 

@@ -3,7 +3,6 @@
 from nodo.application.dtos import (
     DownloadDTO,
     TorrentSearchResultDTO,
-    UserPreferencesDTO,
 )
 from nodo.application.interfaces import (
     IAggregatorService,
@@ -12,16 +11,30 @@ from nodo.application.interfaces import (
     IUserPreferencesRepository,
     TorrentStatus,
 )
+from nodo.application.use_cases import (
+    AddFavoriteAggregator,
+    AddFavoritePath,
+    GetUserPreferences,
+    RemoveFavoriteAggregator,
+    RemoveFavoritePath,
+    UpdateUserPreferences,
+)
 
 __all__ = [
     # DTOs
     "DownloadDTO",
     "TorrentSearchResultDTO",
-    "UserPreferencesDTO",
     # Interfaces
     "IAggregatorService",
     "IDownloadRepository",
     "ITorrentClient",
     "IUserPreferencesRepository",
     "TorrentStatus",
+    # Use Cases
+    "AddFavoriteAggregator",
+    "AddFavoritePath",
+    "GetUserPreferences",
+    "RemoveFavoriteAggregator",
+    "RemoveFavoritePath",
+    "UpdateUserPreferences",
 ]

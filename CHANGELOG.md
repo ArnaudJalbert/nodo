@@ -12,7 +12,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Application layer data transfer objects (DTOs)
   - `DownloadDTO` - Data transfer object for Download entity
   - `TorrentSearchResultDTO` - Data transfer object for TorrentSearchResult entity
-  - `UserPreferencesDTO` - Data transfer object for UserPreferences entity
 - Test suite for application layer DTOs
   - Comprehensive tests for all DTOs with 100% coverage
   - Tests for immutability, equality, and edge cases
@@ -26,6 +25,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - GitHub Actions workflow for automatic documentation deployment to GitHub Pages
   - `nodo-docs` console script for local documentation server
   - Shell script (`scripts/docs.sh`) for convenience
+- User preferences use cases with inner Input/Output classes
+  - `GetUserPreferences` - Retrieve current user preferences
+  - `UpdateUserPreferences` - Update preferences (returns only changed fields)
+  - `AddFavoritePath` - Add favorite download location (returns path and added flag)
+  - `RemoveFavoritePath` - Remove favorite location (returns path and removed flag)
+  - `AddFavoriteAggregator` - Add favorite aggregator (returns name and added flag)
+  - `RemoveFavoriteAggregator` - Remove favorite aggregator (returns name and removed flag)
+- Test suite for all user preferences use cases with 100% coverage
+
+### Removed
+
+- `UserPreferencesDTO` - Replaced by use case-specific inner Output classes
+- `user_preferences_mapper.py` - No longer needed with inner Output classes
+
 
 ## [0.2.0] - 2025-12-08
 
