@@ -34,7 +34,7 @@ from uuid import UUID, uuid4
 
 from nodo.domain.value_objects import (
     AggregatorSource,
-    DownloadStatus,
+    DownloadState,
     FileSize,
     MagnetLink,
 )
@@ -48,7 +48,7 @@ class Download:
     source: AggregatorSource
     size: FileSize
     id_: UUID = field(default_factory=uuid4)
-    status: DownloadStatus = DownloadStatus.DOWNLOADING
+    status: DownloadState = DownloadState.DOWNLOADING
     date_added: datetime = field(default_factory=datetime.now)
     date_completed: datetime | None = None
 ```
@@ -81,7 +81,7 @@ from abc import ABC, abstractmethod
 from uuid import UUID
 
 from nodo.domain.entities import Download
-from nodo.domain.value_objects import DownloadStatus, MagnetLink
+from nodo.domain.value_objects import DownloadState, MagnetLink
 
 class IDownloadRepository(ABC):
     """Interface defined in application layer"""

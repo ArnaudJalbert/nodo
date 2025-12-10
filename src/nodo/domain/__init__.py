@@ -3,6 +3,7 @@
 from nodo.domain.entities import (
     USER_PREFERENCES_ID,
     Download,
+    DownloadStatus,
     TorrentSearchResult,
     UserPreferences,
 )
@@ -19,7 +20,7 @@ from nodo.domain.exceptions import (
 )
 from nodo.domain.value_objects import (
     AggregatorSource,
-    DownloadStatus,
+    DownloadState,
     FileSize,
     MagnetLink,
 )
@@ -27,6 +28,7 @@ from nodo.domain.value_objects import (
 __all__ = [
     # Entities
     "Download",
+    "DownloadStatus",
     "TorrentSearchResult",
     "USER_PREFERENCES_ID",
     "UserPreferences",
@@ -42,7 +44,7 @@ __all__ = [
     "ValidationError",
     # Value Objects
     "AggregatorSource",
-    "DownloadStatus",
+    "DownloadState",
     "FileSize",
     "MagnetLink",
 ]

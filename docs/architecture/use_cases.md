@@ -139,7 +139,7 @@ class UseCase:
 - `downloads: tuple[DownloadDTO, ...]` - List of downloads
 
 **Flow:**
-1. Convert status string to `DownloadStatus` enum if provided
+1. Convert status string to `DownloadState` enum if provided
 2. Query `repository.find_all(status)`
 3. Convert entities to DTOs
 4. Return tuple of DTOs
@@ -162,7 +162,7 @@ class UseCase:
 
 **Output:**
 - `download: DownloadDTO` - Download with current status
-- `status: TorrentStatus | None` - Current torrent client status (if available)
+- `status: DownloadStatus | None` - Current torrent client status (if available)
 
 **Flow:**
 1. Validate and convert UUID string
@@ -510,23 +510,13 @@ def get_all_names() -> list[str]
 
 ```python
 def add_torrent(magnet_link: MagnetLink, download_path: str) -> str  # Returns torrent hash
-def get_status(torrent_hash: str) -> TorrentStatus | None
+def get_status(torrent_hash: str) -> DownloadStatus | None
 def pause(torrent_hash: str) -> bool
 def resume(torrent_hash: str) -> bool
 def remove(torrent_hash: str, delete_files: bool = False) -> bool
 ```
 
-**TorrentStatus DTO:**
-```python
-@dataclass(frozen=True, slots=True, kw_only=True)
-class TorrentStatus:
-    progress: float  # 0.0 to 100.0
-    download_rate: int  # bytes per second
-    upload_rate: int  # bytes per second
-    eta_seconds: int | None
-    is_complete: bool
-    is_paused: bool
-```
+**Note:** `DownloadStatus` is a domain entity (not a DTO) located in `src/nodo/domain/entities/download_status.py`. It contains real-time status information from the torrent client.
 
 **Raises:**
 - `TorrentClientError` - If operations fail

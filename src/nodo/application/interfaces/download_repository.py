@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from uuid import UUID
 
 from nodo.domain.entities import Download
-from nodo.domain.value_objects import DownloadStatus, MagnetLink
+from nodo.domain.value_objects import DownloadState, MagnetLink
 
 
 class IDownloadRepository(ABC):
@@ -49,7 +49,7 @@ class IDownloadRepository(ABC):
         """
 
     @abstractmethod
-    def find_all(self, status: DownloadStatus | None = None) -> list[Download]:
+    def find_all(self, status: DownloadState | None = None) -> list[Download]:
         """Find all downloads, optionally filtered by status.
 
         Args:

@@ -13,7 +13,7 @@ from nodo.domain.entities import Download
 from nodo.domain.exceptions import ValidationError
 from nodo.domain.value_objects import (
     AggregatorSource,
-    DownloadStatus,
+    DownloadState,
     FileSize,
     MagnetLink,
 )
@@ -28,7 +28,7 @@ def test_list_downloads_returns_all_downloads() -> None:
         file_path=Path("/downloads/test1"),
         source=AggregatorSource.from_string("1337x"),
         size=FileSize.from_bytes(1024 * 1024),
-        status=DownloadStatus.DOWNLOADING,
+        status=DownloadState.DOWNLOADING,
         date_added=datetime(2025, 1, 1, 12, 0, 0),
     )
     download2 = Download(
@@ -38,7 +38,7 @@ def test_list_downloads_returns_all_downloads() -> None:
         file_path=Path("/downloads/test2"),
         source=AggregatorSource.from_string("ThePirateBay"),
         size=FileSize.from_bytes(2048 * 1024),
-        status=DownloadStatus.COMPLETED,
+        status=DownloadState.COMPLETED,
         date_added=datetime(2025, 1, 2, 12, 0, 0),
         date_completed=datetime(2025, 1, 2, 13, 0, 0),
     )
@@ -66,7 +66,7 @@ def test_list_downloads_filters_by_status() -> None:
         file_path=Path("/downloads/test"),
         source=AggregatorSource.from_string("1337x"),
         size=FileSize.from_bytes(1024 * 1024),
-        status=DownloadStatus.DOWNLOADING,
+        status=DownloadState.DOWNLOADING,
         date_added=datetime(2025, 1, 1, 12, 0, 0),
     )
 
@@ -79,7 +79,7 @@ def test_list_downloads_filters_by_status() -> None:
 
     assert len(result.downloads) == 1
     assert result.downloads[0].status == "DOWNLOADING"
-    mock_repo.find_all.assert_called_once_with(status=DownloadStatus.DOWNLOADING)
+    mock_repo.find_all.assert_called_once_with(status=DownloadState.DOWNLOADING)
 
 
 def test_list_downloads_sorts_by_date_added_descending() -> None:
@@ -91,7 +91,7 @@ def test_list_downloads_sorts_by_date_added_descending() -> None:
         file_path=Path("/downloads/test1"),
         source=AggregatorSource.from_string("1337x"),
         size=FileSize.from_bytes(1024 * 1024),
-        status=DownloadStatus.DOWNLOADING,
+        status=DownloadState.DOWNLOADING,
         date_added=datetime(2025, 1, 1, 12, 0, 0),
     )
     download2 = Download(
@@ -101,7 +101,7 @@ def test_list_downloads_sorts_by_date_added_descending() -> None:
         file_path=Path("/downloads/test2"),
         source=AggregatorSource.from_string("1337x"),
         size=FileSize.from_bytes(1024 * 1024),
-        status=DownloadStatus.DOWNLOADING,
+        status=DownloadState.DOWNLOADING,
         date_added=datetime(2025, 1, 2, 12, 0, 0),
     )
 
@@ -126,7 +126,7 @@ def test_list_downloads_sorts_by_date_added_ascending() -> None:
         file_path=Path("/downloads/test1"),
         source=AggregatorSource.from_string("1337x"),
         size=FileSize.from_bytes(1024 * 1024),
-        status=DownloadStatus.DOWNLOADING,
+        status=DownloadState.DOWNLOADING,
         date_added=datetime(2025, 1, 1, 12, 0, 0),
     )
     download2 = Download(
@@ -136,7 +136,7 @@ def test_list_downloads_sorts_by_date_added_ascending() -> None:
         file_path=Path("/downloads/test2"),
         source=AggregatorSource.from_string("1337x"),
         size=FileSize.from_bytes(1024 * 1024),
-        status=DownloadStatus.DOWNLOADING,
+        status=DownloadState.DOWNLOADING,
         date_added=datetime(2025, 1, 2, 12, 0, 0),
     )
 
@@ -167,7 +167,7 @@ def test_list_downloads_sorts_by_id() -> None:
         file_path=Path("/downloads/test1"),
         source=AggregatorSource.from_string("1337x"),
         size=FileSize.from_bytes(1024 * 1024),
-        status=DownloadStatus.DOWNLOADING,
+        status=DownloadState.DOWNLOADING,
         date_added=datetime(2025, 1, 1, 12, 0, 0),
     )
     download2 = Download(
@@ -177,7 +177,7 @@ def test_list_downloads_sorts_by_id() -> None:
         file_path=Path("/downloads/test2"),
         source=AggregatorSource.from_string("1337x"),
         size=FileSize.from_bytes(1024 * 1024),
-        status=DownloadStatus.DOWNLOADING,
+        status=DownloadState.DOWNLOADING,
         date_added=datetime(2025, 1, 1, 12, 0, 0),
     )
 
@@ -202,7 +202,7 @@ def test_list_downloads_sorts_by_title() -> None:
         file_path=Path("/downloads/test1"),
         source=AggregatorSource.from_string("1337x"),
         size=FileSize.from_bytes(1024 * 1024),
-        status=DownloadStatus.DOWNLOADING,
+        status=DownloadState.DOWNLOADING,
         date_added=datetime(2025, 1, 1, 12, 0, 0),
     )
     download2 = Download(
@@ -212,7 +212,7 @@ def test_list_downloads_sorts_by_title() -> None:
         file_path=Path("/downloads/test2"),
         source=AggregatorSource.from_string("1337x"),
         size=FileSize.from_bytes(1024 * 1024),
-        status=DownloadStatus.DOWNLOADING,
+        status=DownloadState.DOWNLOADING,
         date_added=datetime(2025, 1, 1, 12, 0, 0),
     )
 
@@ -237,7 +237,7 @@ def test_list_downloads_sorts_by_size() -> None:
         file_path=Path("/downloads/test1"),
         source=AggregatorSource.from_string("1337x"),
         size=FileSize.from_bytes(1024 * 1024),
-        status=DownloadStatus.DOWNLOADING,
+        status=DownloadState.DOWNLOADING,
         date_added=datetime(2025, 1, 1, 12, 0, 0),
     )
     download2 = Download(
@@ -247,7 +247,7 @@ def test_list_downloads_sorts_by_size() -> None:
         file_path=Path("/downloads/test2"),
         source=AggregatorSource.from_string("1337x"),
         size=FileSize.from_bytes(2048 * 1024),
-        status=DownloadStatus.DOWNLOADING,
+        status=DownloadState.DOWNLOADING,
         date_added=datetime(2025, 1, 1, 12, 0, 0),
     )
 
@@ -272,7 +272,7 @@ def test_list_downloads_sorts_by_source() -> None:
         file_path=Path("/downloads/test1"),
         source=AggregatorSource.from_string("ThePirateBay"),
         size=FileSize.from_bytes(1024 * 1024),
-        status=DownloadStatus.DOWNLOADING,
+        status=DownloadState.DOWNLOADING,
         date_added=datetime(2025, 1, 1, 12, 0, 0),
     )
     download2 = Download(
@@ -282,7 +282,7 @@ def test_list_downloads_sorts_by_source() -> None:
         file_path=Path("/downloads/test2"),
         source=AggregatorSource.from_string("1337x"),
         size=FileSize.from_bytes(1024 * 1024),
-        status=DownloadStatus.DOWNLOADING,
+        status=DownloadState.DOWNLOADING,
         date_added=datetime(2025, 1, 1, 12, 0, 0),
     )
 
@@ -307,7 +307,7 @@ def test_list_downloads_sorts_by_status() -> None:
         file_path=Path("/downloads/test1"),
         source=AggregatorSource.from_string("1337x"),
         size=FileSize.from_bytes(1024 * 1024),
-        status=DownloadStatus.FAILED,
+        status=DownloadState.FAILED,
         date_added=datetime(2025, 1, 1, 12, 0, 0),
     )
     download2 = Download(
@@ -317,7 +317,7 @@ def test_list_downloads_sorts_by_status() -> None:
         file_path=Path("/downloads/test2"),
         source=AggregatorSource.from_string("1337x"),
         size=FileSize.from_bytes(1024 * 1024),
-        status=DownloadStatus.COMPLETED,
+        status=DownloadState.COMPLETED,
         date_added=datetime(2025, 1, 1, 12, 0, 0),
     )
 
@@ -342,7 +342,7 @@ def test_list_downloads_sorts_by_date_completed() -> None:
         file_path=Path("/downloads/test1"),
         source=AggregatorSource.from_string("1337x"),
         size=FileSize.from_bytes(1024 * 1024),
-        status=DownloadStatus.COMPLETED,
+        status=DownloadState.COMPLETED,
         date_added=datetime(2025, 1, 1, 12, 0, 0),
         date_completed=datetime(2025, 1, 1, 13, 0, 0),
     )
@@ -353,7 +353,7 @@ def test_list_downloads_sorts_by_date_completed() -> None:
         file_path=Path("/downloads/test2"),
         source=AggregatorSource.from_string("1337x"),
         size=FileSize.from_bytes(1024 * 1024),
-        status=DownloadStatus.COMPLETED,
+        status=DownloadState.COMPLETED,
         date_added=datetime(2025, 1, 1, 12, 0, 0),
         date_completed=datetime(2025, 1, 1, 14, 0, 0),
     )
@@ -364,7 +364,7 @@ def test_list_downloads_sorts_by_date_completed() -> None:
         file_path=Path("/downloads/test3"),
         source=AggregatorSource.from_string("1337x"),
         size=FileSize.from_bytes(1024 * 1024),
-        status=DownloadStatus.DOWNLOADING,
+        status=DownloadState.DOWNLOADING,
         date_added=datetime(2025, 1, 1, 12, 0, 0),
         date_completed=None,
     )
@@ -434,7 +434,7 @@ def test_list_downloads_converts_to_dto() -> None:
         file_path=Path("/downloads/test"),
         source=AggregatorSource.from_string("1337x"),
         size=FileSize.from_bytes(1024 * 1024),
-        status=DownloadStatus.DOWNLOADING,
+        status=DownloadState.DOWNLOADING,
         date_added=datetime(2025, 1, 1, 12, 0, 0),
     )
 
@@ -467,7 +467,7 @@ def test_sort_downloads_raises_error_for_unsupported_field() -> None:
         file_path=Path("/downloads/test"),
         source=AggregatorSource.from_string("1337x"),
         size=FileSize.from_bytes(1024 * 1024),
-        status=DownloadStatus.DOWNLOADING,
+        status=DownloadState.DOWNLOADING,
         date_added=datetime(2025, 1, 1, 12, 0, 0),
     )
 

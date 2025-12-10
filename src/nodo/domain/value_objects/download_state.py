@@ -1,10 +1,10 @@
-"""Download status enumeration."""
+"""Download state enumeration."""
 
 from enum import Enum, auto
 
 
-class DownloadStatus(Enum):
-    """Represents the current status of a download.
+class DownloadState(Enum):
+    """Represents the current state of a download.
 
     Attributes:
         DOWNLOADING: The download is currently in progress.

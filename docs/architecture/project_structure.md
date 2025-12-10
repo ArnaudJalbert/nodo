@@ -119,7 +119,8 @@ nodo/
 
 **Contains:**
 - `entities/` - Business objects (Download, TorrentSearchResult, UserPreferences)
-- `value_objects/` - Immutable values (MagnetLink, FileSize, AggregatorSource, DownloadStatus, TimeDuration)
+- `value_objects/` - Immutable values (MagnetLink, FileSize, AggregatorSource, DownloadState, TimeDuration)
+- `entities/` - Also includes DownloadStatus entity (status information from torrent client)
 - `exceptions/` - Domain exceptions (DomainError, ValidationError, etc.)
 
 **Rules:**

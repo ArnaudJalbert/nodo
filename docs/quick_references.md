@@ -37,7 +37,7 @@ Domain (Entities, Value Objects)
 # Domain tests - No mocks
 def test_entity() -> None:
     entity = Download(...)
-    assert entity.status == DownloadStatus.DOWNLOADING
+    assert entity.status == DownloadState.DOWNLOADING
 
 # Application tests - Mock interfaces with ABC
 def test_use_case() -> None:
@@ -120,7 +120,7 @@ class MagnetLink:
 class Download:
     id: UUID
     magnet_link: MagnetLink
-    status: DownloadStatus
+    status: DownloadState
     # ...
 ```
 

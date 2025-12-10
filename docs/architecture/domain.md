@@ -12,12 +12,12 @@ Represents a torrent that has been downloaded or is currently downloading.
 - `title`: str - Download name
 - `file_path`: Path - Local storage location (pathlib.Path)
 - `source`: AggregatorSource - Origin aggregator
-- `status`: DownloadStatus - Current state (default: DOWNLOADING)
+- `status`: DownloadState - Current state (default: DOWNLOADING)
 - `date_added`: datetime - When initiated (auto-generated)
 - `date_completed`: datetime | None - When finished
 - `size`: FileSize - Total size
 
-**DownloadStatus Enum:**
+**DownloadState Enum (Value Object):**
 - `DOWNLOADING` - In progress (auto-generated value)
 - `COMPLETED` - Finished (auto-generated value)
 - `FAILED` - Error occurred (auto-generated value)
@@ -41,6 +41,22 @@ Represents search results from aggregators. Not persisted.
 - `date_found`: datetime - When retrieved
 
 **Usage:** Exists in memory during search, converted to Download when selected.
+
+---
+
+### DownloadStatus (Entity)
+
+Status information for a download from the torrent client.
+
+**Attributes:**
+- `progress`: float - Download progress as percentage (0.0 to 100.0)
+- `download_rate`: int - Current download speed in bytes per second
+- `upload_rate`: int - Current upload speed in bytes per second
+- `eta_seconds`: int | None - Estimated time remaining in seconds, None if unknown
+- `is_complete`: bool - Whether the download is complete
+- `is_paused`: bool - Whether the download is paused
+
+**Usage:** Returned by torrent client interface to provide real-time status information.
 
 ---
 
@@ -181,6 +197,29 @@ def from_string(name: str) -> AggregatorSource
 def __str__() -> str
 def __eq__(other) -> bool  # Case-insensitive
 ```
+
+---
+
+### DownloadState
+
+Immutable enumeration representing the current state of a download.
+
+**Values:**
+- `DOWNLOADING` - Download is in progress
+- `COMPLETED` - Download finished successfully
+- `FAILED` - Download failed
+- `PAUSED` - Download is paused
+
+**Usage:**
+```python
+from nodo.domain.value_objects import DownloadState
+
+download.status = DownloadState.COMPLETED
+if download.status == DownloadState.DOWNLOADING:
+    # ...
+```
+
+**Note:** Uses `enum.auto()` for values, accessed via `.name` property.
 
 ---
 

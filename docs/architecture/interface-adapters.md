@@ -89,9 +89,9 @@ class QBittorrentAdapter(ITorrentClient):
         # Return torrent hash
         pass
     
-    def get_status(self, torrent_hash: str) -> TorrentStatus | None:
+    def get_status(self, torrent_hash: str) -> DownloadStatus | None:
         # Query qBittorrent API
-        # Convert to TorrentStatus
+        # Convert to DownloadStatus entity
         pass
 ```
 
@@ -146,7 +146,7 @@ def _to_entity(self, model: DownloadModel) -> Download:
         title=model.title,
         file_path=Path(model.file_path),
         source=AggregatorSource(model.source),
-        status=DownloadStatus(model.status),
+        status=DownloadState(model.status),
         size=FileSize(model.size_bytes),
         date_added=model.date_added,
         date_completed=model.date_completed

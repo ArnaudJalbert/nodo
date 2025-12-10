@@ -8,15 +8,14 @@ from nodo.application.dtos import DownloadDTO
 from nodo.application.interfaces import (
     IDownloadRepository,
     ITorrentClient,
-    TorrentStatus,
 )
-from nodo.domain.entities import Download
+from nodo.domain.entities import Download, DownloadStatus
 from nodo.domain.exceptions import (
     DownloadNotFoundError,
     TorrentClientError,
     ValidationError,
 )
-from nodo.domain.value_objects import DownloadStatus, FileSize, TimeDuration
+from nodo.domain.value_objects import DownloadState, FileSize, TimeDuration
 
 
 class GetDownloadStatus:
@@ -141,16 +140,16 @@ class GetDownloadStatus:
             eta=eta,
         )
 
-    # Mapping of (is_complete, is_paused) tuples to DownloadStatus
-    _STATUS_MAPPER: dict[tuple[bool, bool], DownloadStatus] = {
-        (True, False): DownloadStatus.COMPLETED,
-        (True, True): DownloadStatus.COMPLETED,  # Complete takes precedence
-        (False, True): DownloadStatus.PAUSED,
-        (False, False): DownloadStatus.DOWNLOADING,
+    # Mapping of (is_complete, is_paused) tuples to DownloadState
+    _STATUS_MAPPER: dict[tuple[bool, bool], DownloadState] = {
+        (True, False): DownloadState.COMPLETED,
+        (True, True): DownloadState.COMPLETED,  # Complete takes precedence
+        (False, True): DownloadState.PAUSED,
+        (False, False): DownloadState.DOWNLOADING,
     }
 
     def _update_download_status(
-        self, download: Download, torrent_status: TorrentStatus
+        self, download: Download, torrent_status: DownloadStatus
     ) -> Download:
         """Update download status based on torrent client status.
 
@@ -171,7 +170,7 @@ class GetDownloadStatus:
 
             # Set date_completed if newly completed
             if (
-                new_status == DownloadStatus.COMPLETED
+                new_status == DownloadState.COMPLETED
                 and download.date_completed is None
             ):
                 download.date_completed = datetime.now()

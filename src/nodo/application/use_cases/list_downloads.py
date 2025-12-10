@@ -8,7 +8,7 @@ from nodo.application.dtos import DownloadDTO
 from nodo.application.interfaces import IDownloadRepository
 from nodo.domain.entities import Download
 from nodo.domain.exceptions import ValidationError
-from nodo.domain.value_objects import DownloadStatus
+from nodo.domain.value_objects import DownloadState
 
 
 class ListDownloads:
@@ -80,12 +80,12 @@ class ListDownloads:
             ValidationError: If status is invalid or sort_by field is invalid.
         """
         # Convert status string to enum if provided
-        status_filter: DownloadStatus | None = None
+        status_filter: DownloadState | None = None
         if input_data.status is not None:
             try:
-                status_filter = DownloadStatus[input_data.status.upper()]
+                status_filter = DownloadState[input_data.status.upper()]
             except KeyError:
-                valid_statuses = [s.name for s in DownloadStatus]
+                valid_statuses = [s.name for s in DownloadState]
                 raise ValidationError(
                     f"Invalid status '{input_data.status}'. "
                     f"Must be one of: {', '.join(valid_statuses)}"

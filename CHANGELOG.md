@@ -48,6 +48,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Validates non-negative and reasonable maximum values
     - Formats durations from seconds to days with proper pluralization
     - Supports comparison operations and hashing
+- Domain entities
+  - `DownloadStatus` - Status information entity for downloads from torrent client
+    - Contains real-time progress, download/upload rates, ETA, and completion state
+    - Moved from application layer to domain layer for better Clean Architecture compliance
 - Test suite for download management use cases with 100% coverage
 
 ### Changed
@@ -88,12 +92,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `GetDownloadStatus._format_eta` now uses `TimeDuration` value object
   - Encapsulates time duration logic in domain layer
   - Simplifies formatting code and improves reusability
+- `TorrentStatus` moved from application layer to domain layer as `DownloadStatus` entity
+  - `TorrentStatus` dataclass moved from `application/interfaces/torrent_client.py` to `domain/entities/download_status.py`
+  - Represents real-time status information from torrent client (progress, rates, ETA)
+  - Improves Clean Architecture compliance by placing domain concepts in domain layer
+- `DownloadStatus` enum renamed to `DownloadState` (value object)
+  - Avoids naming conflict with new `DownloadStatus` entity
+  - Represents download state (DOWNLOADING, COMPLETED, FAILED, PAUSED)
+  - All references updated throughout codebase, tests, and documentation
 
 ### Removed
 
 - `UserPreferencesDTO` - Replaced by use case-specific inner Output classes
 - `user_preferences_mapper.py` - No longer needed with inner Output classes
 - `SearchTorrents._deduplicate_results()` method - Replaced with set-based deduplication
+- `TorrentStatus` from application layer - Moved to domain layer as `DownloadStatus` entity
+- `DownloadStatus` enum (value object) - Renamed to `DownloadState` to avoid naming conflict
 
 
 ## [0.2.0] - 2025-12-08

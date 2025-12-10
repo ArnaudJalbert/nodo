@@ -9,8 +9,8 @@ from nodo.application.interfaces import (
     IDownloadRepository,
     ITorrentClient,
     IUserPreferencesRepository,
-    TorrentStatus,
 )
+from nodo.domain.entities import DownloadStatus
 from nodo.application.use_cases import (
     AddFavoriteAggregator,
     AddFavoritePath,
@@ -29,7 +29,8 @@ __all__ = [
     "IDownloadRepository",
     "ITorrentClient",
     "IUserPreferencesRepository",
-    "TorrentStatus",
+    # Domain Entities
+    "DownloadStatus",
     # Use Cases
     "AddFavoriteAggregator",
     "AddFavoritePath",

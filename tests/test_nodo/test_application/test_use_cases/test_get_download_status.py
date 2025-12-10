@@ -10,10 +10,9 @@ import pytest
 from nodo.application.interfaces import (
     IDownloadRepository,
     ITorrentClient,
-    TorrentStatus,
 )
 from nodo.application.use_cases.get_download_status import GetDownloadStatus
-from nodo.domain.entities import Download
+from nodo.domain.entities import Download, DownloadStatus
 from nodo.domain.exceptions import (
     DownloadNotFoundError,
     TorrentClientError,
@@ -21,7 +20,7 @@ from nodo.domain.exceptions import (
 )
 from nodo.domain.value_objects import (
     AggregatorSource,
-    DownloadStatus,
+    DownloadState,
     FileSize,
     MagnetLink,
 )
@@ -40,10 +39,10 @@ def test_get_download_status_success() -> None:
         file_path=Path("/downloads/test"),
         source=AggregatorSource.from_string("1337x"),
         size=FileSize.from_bytes(1024 * 1024 * 1024),
-        status=DownloadStatus.DOWNLOADING,
+        status=DownloadState.DOWNLOADING,
     )
 
-    torrent_status = TorrentStatus(
+    torrent_status = DownloadStatus(
         progress=45.5,
         download_rate=1024 * 1024,  # 1 MB/s
         upload_rate=512 * 1024,  # 512 KB/s
@@ -168,7 +167,7 @@ def test_get_download_status_handles_torrent_not_in_client() -> None:
         file_path=Path("/downloads/test"),
         source=AggregatorSource.from_string("1337x"),
         size=FileSize.from_bytes(1024 * 1024),
-        status=DownloadStatus.DOWNLOADING,
+        status=DownloadState.DOWNLOADING,
     )
 
     mock_repo = Mock(spec=IDownloadRepository)
@@ -207,10 +206,10 @@ def test_get_download_status_updates_to_completed() -> None:
         file_path=Path("/downloads/test"),
         source=AggregatorSource.from_string("1337x"),
         size=FileSize.from_bytes(1024 * 1024),
-        status=DownloadStatus.DOWNLOADING,
+        status=DownloadState.DOWNLOADING,
     )
 
-    torrent_status = TorrentStatus(
+    torrent_status = DownloadStatus(
         progress=100.0,
         download_rate=0,
         upload_rate=1024 * 1024,
@@ -238,7 +237,7 @@ def test_get_download_status_updates_to_completed() -> None:
     assert result.download.status == "COMPLETED"
     # Verify download was updated and saved
     saved_download = mock_repo.save.call_args[0][0]
-    assert saved_download.status == DownloadStatus.COMPLETED
+    assert saved_download.status == DownloadState.COMPLETED
     assert saved_download.date_completed is not None
     mock_repo.save.assert_called_once()
 
@@ -255,10 +254,10 @@ def test_get_download_status_updates_to_paused() -> None:
         file_path=Path("/downloads/test"),
         source=AggregatorSource.from_string("1337x"),
         size=FileSize.from_bytes(1024 * 1024),
-        status=DownloadStatus.DOWNLOADING,
+        status=DownloadState.DOWNLOADING,
     )
 
-    torrent_status = TorrentStatus(
+    torrent_status = DownloadStatus(
         progress=50.0,
         download_rate=0,
         upload_rate=0,
@@ -285,7 +284,7 @@ def test_get_download_status_updates_to_paused() -> None:
 
     assert result.download.status == "PAUSED"
     saved_download = mock_repo.save.call_args[0][0]
-    assert saved_download.status == DownloadStatus.PAUSED
+    assert saved_download.status == DownloadState.PAUSED
     mock_repo.save.assert_called_once()
 
 
@@ -301,10 +300,10 @@ def test_get_download_status_updates_from_paused_to_downloading() -> None:
         file_path=Path("/downloads/test"),
         source=AggregatorSource.from_string("1337x"),
         size=FileSize.from_bytes(1024 * 1024),
-        status=DownloadStatus.PAUSED,
+        status=DownloadState.PAUSED,
     )
 
-    torrent_status = TorrentStatus(
+    torrent_status = DownloadStatus(
         progress=50.0,
         download_rate=1024 * 1024,
         upload_rate=512 * 1024,
@@ -331,7 +330,7 @@ def test_get_download_status_updates_from_paused_to_downloading() -> None:
 
     assert result.download.status == "DOWNLOADING"
     saved_download = mock_repo.save.call_args[0][0]
-    assert saved_download.status == DownloadStatus.DOWNLOADING
+    assert saved_download.status == DownloadState.DOWNLOADING
     mock_repo.save.assert_called_once()
 
 
@@ -347,10 +346,10 @@ def test_get_download_status_does_not_update_when_status_unchanged() -> None:
         file_path=Path("/downloads/test"),
         source=AggregatorSource.from_string("1337x"),
         size=FileSize.from_bytes(1024 * 1024),
-        status=DownloadStatus.DOWNLOADING,
+        status=DownloadState.DOWNLOADING,
     )
 
-    torrent_status = TorrentStatus(
+    torrent_status = DownloadStatus(
         progress=50.0,
         download_rate=1024 * 1024,
         upload_rate=512 * 1024,
@@ -491,7 +490,7 @@ def test_to_dto_converts_correctly() -> None:
         file_path=Path("/downloads/test"),
         source=AggregatorSource.from_string("1337x"),
         size=FileSize.from_bytes(1024 * 1024),
-        status=DownloadStatus.COMPLETED,
+        status=DownloadState.COMPLETED,
         date_added=date_added,
         date_completed=date_completed,
     )

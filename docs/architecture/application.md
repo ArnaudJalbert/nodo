@@ -71,22 +71,12 @@ Interface for torrent client operations (e.g., qBittorrent).
 
 **Methods:**
 - `add_torrent(magnet_link: MagnetLink, download_path: str) -> str` - Add and start download, returns torrent hash
-- `get_status(torrent_hash: str) -> TorrentStatus | None` - Get current status
+- `get_status(torrent_hash: str) -> DownloadStatus | None` - Get current status
 - `pause(torrent_hash: str) -> bool` - Pause a torrent
 - `resume(torrent_hash: str) -> bool` - Resume a paused torrent
 - `remove(torrent_hash: str, delete_files: bool = False) -> bool` - Remove a torrent
 
-**TorrentStatus DTO:**
-```python
-@dataclass(frozen=True, slots=True, kw_only=True)
-class TorrentStatus:
-    progress: float  # 0.0 to 100.0
-    download_rate: int  # bytes per second
-    upload_rate: int  # bytes per second
-    eta_seconds: int | None
-    is_complete: bool
-    is_paused: bool
-```
+**Note:** `DownloadStatus` is a domain entity (not a DTO) located in `src/nodo/domain/entities/download_status.py`. It contains real-time status information from the torrent client.
 
 **Raises:**
 - `TorrentClientError` - If operations fail

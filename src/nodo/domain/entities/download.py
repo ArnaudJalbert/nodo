@@ -7,7 +7,7 @@ from uuid import UUID, uuid4
 
 from nodo.domain.value_objects import (
     AggregatorSource,
-    DownloadStatus,
+    DownloadState,
     FileSize,
     MagnetLink,
 )
@@ -38,6 +38,6 @@ class Download:
     source: AggregatorSource
     size: FileSize
     id_: UUID = field(default_factory=uuid4)
-    status: DownloadStatus = DownloadStatus.DOWNLOADING
+    status: DownloadState = DownloadState.DOWNLOADING
     date_added: datetime = field(default_factory=datetime.now)
     date_completed: datetime | None = None

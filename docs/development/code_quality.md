@@ -89,7 +89,7 @@ def search_torrents(
 class Download:
     id: UUID
     title: str
-    status: DownloadStatus
+    status: DownloadState
 ```
 
 ✅ **Use modern type syntax (Python 3.11+):**
@@ -295,7 +295,7 @@ class DownloadDTO:
 ```python
 from enum import Enum
 
-class DownloadStatus(Enum):
+class DownloadState(Enum):
     DOWNLOADING = "DOWNLOADING"
     COMPLETED = "COMPLETED"
     FAILED = "FAILED"

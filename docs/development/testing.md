@@ -58,12 +58,12 @@ def test_download_entity_creation() -> None:
         title="Test",
         file_path=FilePath("/downloads/test"),
         source=AggregatorSource.from_string("1337x"),
-        status=DownloadStatus.DOWNLOADING,
+        status=DownloadState.DOWNLOADING,
         date_added=datetime.now(),
         date_completed=None,
         size=FileSize.from_string("1.5 GB")
     )
-    assert download.status == DownloadStatus.DOWNLOADING
+    assert download.status == DownloadState.DOWNLOADING
 
 def test_file_size_validates_negative() -> None:
     """Should reject negative file sizes."""
