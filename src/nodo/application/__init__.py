@@ -10,7 +10,6 @@ from nodo.application.interfaces import (
     ITorrentClient,
     IUserPreferencesRepository,
 )
-from nodo.domain.entities import DownloadStatus
 from nodo.application.use_cases import (
     AddFavoriteAggregator,
     AddFavoritePath,
@@ -19,6 +18,7 @@ from nodo.application.use_cases import (
     RemoveFavoritePath,
     UpdateUserPreferences,
 )
+from nodo.domain.entities import DownloadStatus
 
 __all__ = [
     # DTOs

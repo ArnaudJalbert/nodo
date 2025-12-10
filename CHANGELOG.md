@@ -59,7 +59,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Documentation updated to accurately reflect current project state
   - Fixed project name references (`torrent-cli` → `nodo`)
   - Updated Python version requirement (3.11+ → 3.13+)
-  - Corrected entity attributes (`id` → `id_`, `DownloadStatus` enum values)
+  - Corrected entity attributes (`id` → `id_`, `DownloadState` enum values)
   - Updated use case naming (`InputData`/`OutputData` → `Input`/`Output`)
   - Added missing `TimeDuration` value object documentation
   - Clarified `FilePath` is `pathlib.Path` (not separate value object)
