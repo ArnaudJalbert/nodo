@@ -54,14 +54,17 @@ class AddFavoriteAggregator:
             Output containing the normalized aggregator name and whether it was added.
 
         Raises:
-            ValidationError: If the aggregator name is empty or not a supported aggregator.
+            ValidationError: If the aggregator name is empty or
+                             not a supported aggregator.
             FileSystemError: If there's an error reading or writing preferences.
         """
         source = AggregatorSource.from_string(input_data.aggregator_name)
         if not source.is_supported:
             raise ValidationError(
                 f"Unsupported aggregator: '{input_data.aggregator_name}'. "
-                f"Supported aggregators: {', '.join(AggregatorSource.get_supported_aggregators())}"
+                f"Supported aggregators: {
+                    ', '.join(AggregatorSource.get_supported_aggregators())
+                }"
             )
         preferences = self._preferences_repository.get()
         count_before = len(preferences.favorite_aggregators)

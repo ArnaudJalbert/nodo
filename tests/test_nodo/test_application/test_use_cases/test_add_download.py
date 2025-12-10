@@ -266,7 +266,8 @@ def test_add_download_raises_error_for_torrent_client_failure() -> None:
         use_case.execute(input_data)
 
     assert "torrent client" in str(exc_info.value).lower()
-    # Repository save should be called twice: once for initial save, once for FAILED status update
+    # Repository save should be called twice:
+    # once for initial save, once for FAILED status update
     assert mock_repo.save.call_count == 2
     # Verify the statuses at the time of each save call
     assert saved_statuses[0] == DownloadState.DOWNLOADING
@@ -316,12 +317,12 @@ def test_add_download_sets_status_to_failed_on_torrent_client_error() -> None:
     # Since it's the same object, we need to verify it's the same instance
     first_download = saved_downloads[0]
     second_download = saved_downloads[1]
-    
+
     # Verify it's the same download entity (same ID)
     assert first_download.id_ == second_download.id_
     assert first_download.magnet_link.info_hash == second_download.magnet_link.info_hash
     assert first_download.title == second_download.title
-    
+
     # The second download will have FAILED status (since we modified the same object)
     # We can't check the first one's status after modification, but we know:
     # 1. It was saved initially (first call)
