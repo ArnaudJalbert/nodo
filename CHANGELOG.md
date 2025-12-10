@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.3.0] 2025-12-08
+## [0.3.0] - 2025-12-08
 
 ### Added
 
@@ -52,6 +52,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Documentation updated to accurately reflect current project state
+  - Fixed project name references (`torrent-cli` → `nodo`)
+  - Updated Python version requirement (3.11+ → 3.13+)
+  - Corrected entity attributes (`id` → `id_`, `DownloadStatus` enum values)
+  - Updated use case naming (`InputData`/`OutputData` → `Input`/`Output`)
+  - Added missing `TimeDuration` value object documentation
+  - Clarified `FilePath` is `pathlib.Path` (not separate value object)
+  - Fixed exception names (`DomainException` → `DomainError`)
+  - Updated interface method signatures to match actual implementations
+  - Marked interface adapters and infrastructure layers as "to be implemented"
+  - Updated use case count (10 implemented, 4 planned)
+  - Added `IAggregatorServiceRegistry` interface documentation
+- MkDocs navigation updated to include all documentation files
+  - Added missing architecture documentation (layers, project structure, use cases, dependency injection)
+  - Added missing development documentation (code quality, tech stack)
+  - Added quick reference guide
+  - Reorganized navigation structure for better discoverability
+- CLAUDE.md updated with accurate project status and file paths
 - `SearchTorrents` use case now accepts `IAggregatorServiceRegistry` interface instead of dict
   - Improves Clean Architecture compliance by depending on abstractions
 - `SearchTorrents` validation: empty `aggregator_names` list now raises `ValidationError`
