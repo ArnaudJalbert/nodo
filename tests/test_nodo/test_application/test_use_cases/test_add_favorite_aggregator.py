@@ -143,3 +143,24 @@ def test_add_favorite_aggregator_calls_repository_methods() -> None:
 
     mock_repo.get.assert_called_once()
     mock_repo.save.assert_called_once()
+
+
+def test_add_favorite_aggregator_raises_error_for_unsupported_aggregator() -> None:
+    """Should raise ValidationError for unsupported aggregator name."""
+    preferences = UserPreferences(
+        default_download_path=Path("/home/user/Downloads"),
+        favorite_aggregators=[],
+    )
+
+    mock_repo = Mock(spec=IUserPreferencesRepository)
+    mock_repo.get.return_value = preferences
+
+    use_case = AddFavoriteAggregator(preferences_repository=mock_repo)
+    input_data = AddFavoriteAggregator.Input(aggregator_name="InvalidAggregator")
+
+    with pytest.raises(ValidationError) as exc_info:
+        use_case.execute(input_data)
+
+    assert "unsupported aggregator" in str(exc_info.value).lower()
+    assert "InvalidAggregator" in str(exc_info.value)
+    mock_repo.save.assert_not_called()
