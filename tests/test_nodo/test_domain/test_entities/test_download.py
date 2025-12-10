@@ -9,7 +9,7 @@ import pytest
 from nodo.domain.entities import Download
 from nodo.domain.value_objects import (
     AggregatorSource,
-    DownloadStatus,
+    DownloadState,
     FileSize,
     MagnetLink,
 )
@@ -37,7 +37,7 @@ def test_download_create_with_required_fields() -> None:
     assert download.file_path == file_path
     assert download.source == source
     assert download.size == size
-    assert download.status == DownloadStatus.DOWNLOADING
+    assert download.status == DownloadState.DOWNLOADING
     assert download.date_completed is None
     assert isinstance(download.id_, UUID)
     assert isinstance(download.date_added, datetime)
@@ -62,13 +62,13 @@ def test_download_create_with_all_fields() -> None:
         source=source,
         size=size,
         id_=custom_id,
-        status=DownloadStatus.COMPLETED,
+        status=DownloadState.COMPLETED,
         date_added=date_added,
         date_completed=date_completed,
     )
 
     assert download.id_ == custom_id
-    assert download.status == DownloadStatus.COMPLETED
+    assert download.status == DownloadState.COMPLETED
     assert download.date_added == date_added
     assert download.date_completed == date_completed
 
@@ -85,9 +85,9 @@ def test_download_status_is_mutable() -> None:
         size=FileSize(bytes_=1024),
     )
 
-    assert download.status == DownloadStatus.DOWNLOADING
-    download.status = DownloadStatus.COMPLETED
-    assert download.status == DownloadStatus.COMPLETED
+    assert download.status == DownloadState.DOWNLOADING
+    download.status = DownloadState.COMPLETED
+    assert download.status == DownloadState.COMPLETED
 
 
 def test_download_date_completed_is_mutable() -> None:

@@ -26,7 +26,7 @@ Nodo is a CLI-based torrent download manager built with Clean Architecture princ
 - [x] `DownloadStatus` - Enum (DOWNLOADING, COMPLETED, FAILED, PAUSED)
 
 ### 1.3 Entities ✅
-- [x] `TorrentSearchResult` - Ephemeral search result
+- [x] `TorrentSearchResult` - Ephemeral search result (hashable by magnet link)
 - [x] `Download` - Core persisted entity
 - [x] `UserPreferences` - Singleton preferences entity
 
@@ -35,29 +35,30 @@ Nodo is a CLI-based torrent download manager built with Clean Architecture princ
 ## Phase 2: Application Layer
 *Depends only on domain layer*
 
-### 2.1 Interfaces (ABCs)
-- [ ] `IDownloadRepository` - Download persistence
-- [ ] `IUserPreferencesRepository` - Preferences persistence
-- [ ] `IAggregatorService` - Torrent search service
-- [ ] `ITorrentClient` - Torrent client operations
+### 2.1 Interfaces (ABCs) ✅
+- [x] `IDownloadRepository` - Download persistence
+- [x] `IUserPreferencesRepository` - Preferences persistence
+- [x] `IAggregatorService` - Torrent search service
+- [x] `ITorrentClient` - Torrent client operations
+- [x] `IAggregatorServiceRegistry` - Aggregator service registry interface
 
-### 2.2 Shared DTOs
-- [ ] `DownloadDTO` - Download data transfer object
-- [ ] `TorrentSearchResultDTO` - Search result DTO
-- [ ] `UserPreferencesDTO` - Preferences DTO
+### 2.2 Shared DTOs ✅
+- [x] `DownloadDTO` - Download data transfer object
+- [x] `TorrentSearchResultDTO` - Search result DTO
+- [x] `UserPreferencesDTO` - Preferences DTO
 
-### 2.3 User Preferences Use Cases
-- [ ] `GetUserPreferences` - Load preferences
-- [ ] `UpdateUserPreferences` - Update settings
-- [ ] `AddFavoritePath` - Add favorite download location
-- [ ] `RemoveFavoritePath` - Remove favorite location
-- [ ] `AddFavoriteAggregator` - Add favorite source
-- [ ] `RemoveFavoriteAggregator` - Remove favorite source
+### 2.3 User Preferences Use Cases ✅
+- [x] `GetUserPreferences` - Load preferences
+- [x] `UpdateUserPreferences` - Update settings
+- [x] `AddFavoritePath` - Add favorite download location
+- [x] `RemoveFavoritePath` - Remove favorite location
+- [x] `AddFavoriteAggregator` - Add favorite source
+- [x] `RemoveFavoriteAggregator` - Remove favorite source
 
 ### 2.4 Download Management Use Cases
-- [ ] `SearchTorrents` - Search across aggregators
-- [ ] `AddDownload` - Add and start download
-- [ ] `ListDownloads` - List downloads with filtering
+- [x] `SearchTorrents` - Search across aggregators with deduplication
+- [x] `AddDownload` - Add and start download
+- [x] `ListDownloads` - List downloads with filtering and sorting
 - [ ] `GetDownloadStatus` - Get status and progress
 - [ ] `RemoveDownload` - Remove download
 - [ ] `PauseDownload` - Pause active download
@@ -146,6 +147,13 @@ Nodo is a CLI-based torrent download manager built with Clean Architecture princ
 | 2025-12-08 | Phase 1.1 - Domain exceptions | Completed |
 | 2025-12-08 | Phase 1.2 - Value objects | Completed |
 | 2025-12-08 | Phase 1.3 - Entities | Completed |
+| 2025-12-08 | Phase 2.2 - Shared DTOs | Completed |
+| 2025-12-08 | Phase 2.3 - User Preferences Use Cases | Completed |
+| 2025-12-08 | Phase 2.4 - SearchTorrents use case | Completed |
+| 2025-12-08 | Phase 2.4 - AddDownload use case | Completed |
+| 2025-12-08 | Phase 2.4 - ListDownloads use case | Completed |
+| 2025-12-08 | Phase 2.1 - IAggregatorServiceRegistry interface | Completed |
+| 2025-12-08 | TorrentSearchResult hashability (set-based deduplication) | Completed |
 
 ---
 

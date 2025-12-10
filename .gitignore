@@ -17,7 +17,12 @@ htmlcov/
 
 # Claude Files
 .claude/
+commit_message.txt
+PR_DESCRIPTION.md
 
 # IDE files
 .vscode/
 .idea/
+
+# MkDocs build output
+site/

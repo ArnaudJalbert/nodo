@@ -31,3 +31,13 @@ class TorrentSearchResult:
     leechers: int
     source: AggregatorSource
     date_found: datetime
+
+    def __hash__(self) -> int:
+        """Hash based on magnet link for deduplication."""
+        return hash(self.magnet_link)
+
+    def __eq__(self, other: object) -> bool:
+        """Two results are equal if they have the same magnet link."""
+        if not isinstance(other, TorrentSearchResult):
+            return NotImplemented
+        return self.magnet_link == other.magnet_link
