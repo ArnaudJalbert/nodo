@@ -7,6 +7,7 @@ from uuid import uuid4
 
 import pytest
 
+from nodo.application.interfaces import IDownloadRepository
 from nodo.application.use_cases.list_downloads import ListDownloads
 from nodo.domain.entities import Download
 from nodo.domain.exceptions import ValidationError
@@ -42,7 +43,7 @@ def test_list_downloads_returns_all_downloads() -> None:
         date_completed=datetime(2025, 1, 2, 13, 0, 0),
     )
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IDownloadRepository)
     mock_repo.find_all.return_value = [download1, download2]
 
     use_case = ListDownloads(download_repository=mock_repo)
@@ -69,7 +70,7 @@ def test_list_downloads_filters_by_status() -> None:
         date_added=datetime(2025, 1, 1, 12, 0, 0),
     )
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IDownloadRepository)
     mock_repo.find_all.return_value = [download]
 
     use_case = ListDownloads(download_repository=mock_repo)
@@ -104,7 +105,7 @@ def test_list_downloads_sorts_by_date_added_descending() -> None:
         date_added=datetime(2025, 1, 2, 12, 0, 0),
     )
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IDownloadRepository)
     mock_repo.find_all.return_value = [download1, download2]
 
     use_case = ListDownloads(download_repository=mock_repo)
@@ -139,7 +140,7 @@ def test_list_downloads_sorts_by_date_added_ascending() -> None:
         date_added=datetime(2025, 1, 2, 12, 0, 0),
     )
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IDownloadRepository)
     mock_repo.find_all.return_value = [download1, download2]
 
     use_case = ListDownloads(download_repository=mock_repo)
@@ -180,7 +181,7 @@ def test_list_downloads_sorts_by_id() -> None:
         date_added=datetime(2025, 1, 1, 12, 0, 0),
     )
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IDownloadRepository)
     mock_repo.find_all.return_value = [download2, download1]  # Reverse order
 
     use_case = ListDownloads(download_repository=mock_repo)
@@ -215,7 +216,7 @@ def test_list_downloads_sorts_by_title() -> None:
         date_added=datetime(2025, 1, 1, 12, 0, 0),
     )
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IDownloadRepository)
     mock_repo.find_all.return_value = [download1, download2]
 
     use_case = ListDownloads(download_repository=mock_repo)
@@ -250,7 +251,7 @@ def test_list_downloads_sorts_by_size() -> None:
         date_added=datetime(2025, 1, 1, 12, 0, 0),
     )
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IDownloadRepository)
     mock_repo.find_all.return_value = [download1, download2]
 
     use_case = ListDownloads(download_repository=mock_repo)
@@ -285,7 +286,7 @@ def test_list_downloads_sorts_by_source() -> None:
         date_added=datetime(2025, 1, 1, 12, 0, 0),
     )
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IDownloadRepository)
     mock_repo.find_all.return_value = [download1, download2]
 
     use_case = ListDownloads(download_repository=mock_repo)
@@ -320,7 +321,7 @@ def test_list_downloads_sorts_by_status() -> None:
         date_added=datetime(2025, 1, 1, 12, 0, 0),
     )
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IDownloadRepository)
     mock_repo.find_all.return_value = [download1, download2]
 
     use_case = ListDownloads(download_repository=mock_repo)
@@ -368,7 +369,7 @@ def test_list_downloads_sorts_by_date_completed() -> None:
         date_completed=None,
     )
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IDownloadRepository)
     mock_repo.find_all.return_value = [download1, download2, download3]
 
     use_case = ListDownloads(download_repository=mock_repo)
@@ -384,7 +385,7 @@ def test_list_downloads_sorts_by_date_completed() -> None:
 
 def test_list_downloads_raises_error_for_invalid_status() -> None:
     """Should raise ValidationError for invalid status."""
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IDownloadRepository)
 
     use_case = ListDownloads(download_repository=mock_repo)
     input_data = ListDownloads.Input(status="INVALID_STATUS")
@@ -398,7 +399,7 @@ def test_list_downloads_raises_error_for_invalid_status() -> None:
 
 def test_list_downloads_raises_error_for_invalid_sort_by() -> None:
     """Should raise ValidationError for invalid sort_by field."""
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IDownloadRepository)
     mock_repo.find_all.return_value = []
 
     use_case = ListDownloads(download_repository=mock_repo)
@@ -413,7 +414,7 @@ def test_list_downloads_raises_error_for_invalid_sort_by() -> None:
 
 def test_list_downloads_returns_empty_list() -> None:
     """Should return empty list when no downloads exist."""
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IDownloadRepository)
     mock_repo.find_all.return_value = []
 
     use_case = ListDownloads(download_repository=mock_repo)
@@ -437,7 +438,7 @@ def test_list_downloads_converts_to_dto() -> None:
         date_added=datetime(2025, 1, 1, 12, 0, 0),
     )
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IDownloadRepository)
     mock_repo.find_all.return_value = [download]
 
     use_case = ListDownloads(download_repository=mock_repo)

@@ -3,6 +3,7 @@
 from pathlib import Path
 from unittest.mock import Mock
 
+from nodo.application.interfaces import IUserPreferencesRepository
 from nodo.application.use_cases.add_favorite_path import AddFavoritePath
 from nodo.domain.entities import UserPreferences
 
@@ -14,7 +15,7 @@ def test_add_favorite_path_adds_new_path() -> None:
         favorite_paths=[],
     )
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IUserPreferencesRepository)
     mock_repo.get.return_value = preferences
 
     use_case = AddFavoritePath(preferences_repository=mock_repo)
@@ -33,7 +34,7 @@ def test_add_favorite_path_does_not_duplicate_existing_path() -> None:
         favorite_paths=[Path("/home/user/Movies")],
     )
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IUserPreferencesRepository)
     mock_repo.get.return_value = preferences
 
     use_case = AddFavoritePath(preferences_repository=mock_repo)
@@ -52,7 +53,7 @@ def test_add_favorite_path_adds_to_existing_list() -> None:
         favorite_paths=[Path("/home/user/Movies")],
     )
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IUserPreferencesRepository)
     mock_repo.get.return_value = preferences
 
     use_case = AddFavoritePath(preferences_repository=mock_repo)
@@ -71,7 +72,7 @@ def test_add_favorite_path_calls_repository_methods() -> None:
         favorite_paths=[],
     )
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IUserPreferencesRepository)
     mock_repo.get.return_value = preferences
 
     use_case = AddFavoritePath(preferences_repository=mock_repo)

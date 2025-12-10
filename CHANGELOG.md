@@ -37,11 +37,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `ListDownloads` - List all downloads with filtering and sorting
   - `AddDownload` - Add and start a new download
   - `SearchTorrents` - Search torrents across multiple aggregators with deduplication
+  - `GetDownloadStatus` - Get current status and progress of a download with real-time updates
 - Application layer interfaces
   - `IAggregatorServiceRegistry` - Interface for accessing aggregator services by name
 - Domain entity hashability
   - `TorrentSearchResult` now implements `__hash__` and `__eq__` based on magnet link
   - Enables set-based deduplication at the domain level
+- Domain value objects
+  - `TimeDuration` - Time duration value object with human-readable formatting
+    - Validates non-negative and reasonable maximum values
+    - Formats durations from seconds to days with proper pluralization
+    - Supports comparison operations and hashing
 - Test suite for download management use cases with 100% coverage
 
 ### Changed
@@ -52,6 +58,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Only `None` triggers preference-based or all-available aggregator selection
 - Deduplication in `SearchTorrents` now uses set-based approach instead of manual function
   - Leverages hashable `TorrentSearchResult` entity for efficient deduplication
+- All test Mock objects now use `spec` parameter for type safety
+  - Ensures only methods defined on interfaces can be called
+  - Prevents typos and accidental method calls
+  - Improves IDE autocomplete and type checking
+- `GetDownloadStatus` now uses dictionary mapper for status determination
+  - Replaces if/elif/else chain with cleaner, more extensible approach
+- `GetDownloadStatus` formatting methods now validate input data
+  - `_format_speed` and `_format_eta` return `None` for unreadable/invalid data
+  - Allows use case to continue execution gracefully when data is unavailable
+- `GetDownloadStatus._format_eta` now uses `TimeDuration` value object
+  - Encapsulates time duration logic in domain layer
+  - Simplifies formatting code and improves reusability
 
 ### Removed
 

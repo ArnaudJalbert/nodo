@@ -5,6 +5,7 @@ from unittest.mock import Mock
 
 import pytest
 
+from nodo.application.interfaces import IUserPreferencesRepository
 from nodo.application.use_cases.add_favorite_aggregator import AddFavoriteAggregator
 from nodo.domain.entities import UserPreferences
 from nodo.domain.exceptions import ValidationError
@@ -18,7 +19,7 @@ def test_add_favorite_aggregator_adds_new_aggregator() -> None:
         favorite_aggregators=[],
     )
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IUserPreferencesRepository)
     mock_repo.get.return_value = preferences
 
     use_case = AddFavoriteAggregator(preferences_repository=mock_repo)
@@ -37,7 +38,7 @@ def test_add_favorite_aggregator_does_not_duplicate_existing() -> None:
         favorite_aggregators=[AggregatorSource(name="1337x")],
     )
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IUserPreferencesRepository)
     mock_repo.get.return_value = preferences
 
     use_case = AddFavoriteAggregator(preferences_repository=mock_repo)
@@ -56,7 +57,7 @@ def test_add_favorite_aggregator_adds_to_existing_list() -> None:
         favorite_aggregators=[AggregatorSource(name="1337x")],
     )
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IUserPreferencesRepository)
     mock_repo.get.return_value = preferences
 
     use_case = AddFavoriteAggregator(preferences_repository=mock_repo)
@@ -75,7 +76,7 @@ def test_add_favorite_aggregator_normalizes_name() -> None:
         favorite_aggregators=[],
     )
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IUserPreferencesRepository)
     mock_repo.get.return_value = preferences
 
     use_case = AddFavoriteAggregator(preferences_repository=mock_repo)
@@ -95,7 +96,7 @@ def test_add_favorite_aggregator_raises_validation_error_for_empty_name() -> Non
         favorite_aggregators=[],
     )
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IUserPreferencesRepository)
     mock_repo.get.return_value = preferences
 
     use_case = AddFavoriteAggregator(preferences_repository=mock_repo)
@@ -114,7 +115,7 @@ def test_add_favorite_aggregator_raises_validation_error_for_whitespace() -> Non
         favorite_aggregators=[],
     )
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IUserPreferencesRepository)
     mock_repo.get.return_value = preferences
 
     use_case = AddFavoriteAggregator(preferences_repository=mock_repo)
@@ -133,7 +134,7 @@ def test_add_favorite_aggregator_calls_repository_methods() -> None:
         favorite_aggregators=[],
     )
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IUserPreferencesRepository)
     mock_repo.get.return_value = preferences
 
     use_case = AddFavoriteAggregator(preferences_repository=mock_repo)

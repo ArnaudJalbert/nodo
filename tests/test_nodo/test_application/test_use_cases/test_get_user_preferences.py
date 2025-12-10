@@ -4,6 +4,7 @@ from datetime import datetime
 from pathlib import Path
 from unittest.mock import Mock
 
+from nodo.application.interfaces import IUserPreferencesRepository
 from nodo.application.use_cases.get_user_preferences import GetUserPreferences
 from nodo.domain.entities import UserPreferences
 from nodo.domain.value_objects import AggregatorSource
@@ -21,7 +22,7 @@ def test_get_user_preferences_returns_output() -> None:
         date_modified=datetime(2025, 1, 2, 12, 0, 0),
     )
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IUserPreferencesRepository)
     mock_repo.get.return_value = preferences
 
     use_case = GetUserPreferences(preferences_repository=mock_repo)
@@ -40,7 +41,7 @@ def test_get_user_preferences_with_default_preferences() -> None:
     """Should return Output for default preferences."""
     preferences = UserPreferences.create_default()
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IUserPreferencesRepository)
     mock_repo.get.return_value = preferences
 
     use_case = GetUserPreferences(preferences_repository=mock_repo)
@@ -57,7 +58,7 @@ def test_get_user_preferences_calls_repository() -> None:
     """Should call repository.get() method."""
     preferences = UserPreferences.create_default()
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IUserPreferencesRepository)
     mock_repo.get.return_value = preferences
 
     use_case = GetUserPreferences(preferences_repository=mock_repo)

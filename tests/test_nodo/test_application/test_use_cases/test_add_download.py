@@ -8,6 +8,7 @@ from uuid import uuid4
 import pytest
 
 from nodo.application.dtos import DownloadDTO
+from nodo.application.interfaces import IDownloadRepository, ITorrentClient
 from nodo.application.use_cases.add_download import AddDownload
 from nodo.domain.entities import Download
 from nodo.domain.exceptions import (
@@ -26,11 +27,11 @@ def test_add_download_success() -> None:
     size = "1.5 GB"
     file_path = "/downloads/test_download"
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IDownloadRepository)
     mock_repo.exists_by_magnet_link.return_value = False
     mock_repo.save.return_value = None
 
-    mock_client = Mock()
+    mock_client = Mock(spec=ITorrentClient)
     mock_client.add_torrent.return_value = "torrent_hash_123"
 
     use_case = AddDownload(
@@ -64,10 +65,10 @@ def test_add_download_uses_provided_file_path() -> None:
     magnet_link_str = "magnet:?xt=urn:btih:" + "a" * 40
     file_path = "/custom/path/download"
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IDownloadRepository)
     mock_repo.exists_by_magnet_link.return_value = False
 
-    mock_client = Mock()
+    mock_client = Mock(spec=ITorrentClient)
     mock_client.add_torrent.return_value = "torrent_hash_123"
 
     use_case = AddDownload(
@@ -95,10 +96,10 @@ def test_add_download_raises_error_for_duplicate() -> None:
     """Should raise DuplicateDownloadError for duplicate magnet link."""
     magnet_link_str = "magnet:?xt=urn:btih:" + "a" * 40
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IDownloadRepository)
     mock_repo.exists_by_magnet_link.return_value = True
 
-    mock_client = Mock()
+    mock_client = Mock(spec=ITorrentClient)
 
     use_case = AddDownload(
         download_repository=mock_repo,
@@ -123,8 +124,8 @@ def test_add_download_raises_error_for_duplicate() -> None:
 
 def test_add_download_raises_error_for_empty_title() -> None:
     """Should raise ValidationError for empty title."""
-    mock_repo = Mock()
-    mock_client = Mock()
+    mock_repo = Mock(spec=IDownloadRepository)
+    mock_client = Mock(spec=ITorrentClient)
 
     use_case = AddDownload(
         download_repository=mock_repo,
@@ -148,8 +149,8 @@ def test_add_download_raises_error_for_empty_title() -> None:
 
 def test_add_download_raises_error_for_invalid_magnet_link() -> None:
     """Should raise ValidationError for invalid magnet link."""
-    mock_repo = Mock()
-    mock_client = Mock()
+    mock_repo = Mock(spec=IDownloadRepository)
+    mock_client = Mock(spec=ITorrentClient)
 
     use_case = AddDownload(
         download_repository=mock_repo,
@@ -170,10 +171,10 @@ def test_add_download_raises_error_for_invalid_magnet_link() -> None:
 
 def test_add_download_raises_error_for_invalid_size() -> None:
     """Should raise ValidationError for invalid size format."""
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IDownloadRepository)
     mock_repo.exists_by_magnet_link.return_value = False
 
-    mock_client = Mock()
+    mock_client = Mock(spec=ITorrentClient)
 
     use_case = AddDownload(
         download_repository=mock_repo,
@@ -198,10 +199,10 @@ def test_add_download_raises_error_for_invalid_size() -> None:
 
 def test_add_download_raises_error_for_invalid_source() -> None:
     """Should raise ValidationError for invalid aggregator source."""
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IDownloadRepository)
     mock_repo.exists_by_magnet_link.return_value = False
 
-    mock_client = Mock()
+    mock_client = Mock(spec=ITorrentClient)
 
     use_case = AddDownload(
         download_repository=mock_repo,
@@ -229,10 +230,10 @@ def test_add_download_raises_error_for_torrent_client_failure() -> None:
     """Should raise TorrentClientError when client fails."""
     magnet_link_str = "magnet:?xt=urn:btih:" + "a" * 40
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IDownloadRepository)
     mock_repo.exists_by_magnet_link.return_value = False
 
-    mock_client = Mock()
+    mock_client = Mock(spec=ITorrentClient)
     mock_client.add_torrent.side_effect = TorrentClientError("Client error")
 
     use_case = AddDownload(

@@ -5,6 +5,7 @@ from unittest.mock import Mock
 
 import pytest
 
+from nodo.application.interfaces import IUserPreferencesRepository
 from nodo.application.use_cases.remove_favorite_aggregator import (
     RemoveFavoriteAggregator,
 )
@@ -23,7 +24,7 @@ def test_remove_favorite_aggregator_removes_existing() -> None:
         ],
     )
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IUserPreferencesRepository)
     mock_repo.get.return_value = preferences
 
     use_case = RemoveFavoriteAggregator(preferences_repository=mock_repo)
@@ -42,7 +43,7 @@ def test_remove_favorite_aggregator_handles_nonexistent() -> None:
         favorite_aggregators=[AggregatorSource(name="1337x")],
     )
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IUserPreferencesRepository)
     mock_repo.get.return_value = preferences
 
     use_case = RemoveFavoriteAggregator(preferences_repository=mock_repo)
@@ -61,7 +62,7 @@ def test_remove_favorite_aggregator_from_empty_list() -> None:
         favorite_aggregators=[],
     )
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IUserPreferencesRepository)
     mock_repo.get.return_value = preferences
 
     use_case = RemoveFavoriteAggregator(preferences_repository=mock_repo)
@@ -80,7 +81,7 @@ def test_remove_favorite_aggregator_normalizes_name() -> None:
         favorite_aggregators=[AggregatorSource(name="1337x")],
     )
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IUserPreferencesRepository)
     mock_repo.get.return_value = preferences
 
     use_case = RemoveFavoriteAggregator(preferences_repository=mock_repo)
@@ -101,7 +102,7 @@ def test_remove_favorite_aggregator_raises_validation_error_for_empty_name() -> 
         favorite_aggregators=[],
     )
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IUserPreferencesRepository)
     mock_repo.get.return_value = preferences
 
     use_case = RemoveFavoriteAggregator(preferences_repository=mock_repo)
@@ -120,7 +121,7 @@ def test_remove_favorite_aggregator_raises_validation_error_for_whitespace() -> 
         favorite_aggregators=[],
     )
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IUserPreferencesRepository)
     mock_repo.get.return_value = preferences
 
     use_case = RemoveFavoriteAggregator(preferences_repository=mock_repo)
@@ -139,7 +140,7 @@ def test_remove_favorite_aggregator_calls_repository_methods() -> None:
         favorite_aggregators=[AggregatorSource(name="1337x")],
     )
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IUserPreferencesRepository)
     mock_repo.get.return_value = preferences
 
     use_case = RemoveFavoriteAggregator(preferences_repository=mock_repo)

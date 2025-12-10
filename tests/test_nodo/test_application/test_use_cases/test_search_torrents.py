@@ -5,7 +5,11 @@ from unittest.mock import Mock
 
 import pytest
 
-from nodo.application.interfaces import IAggregatorServiceRegistry
+from nodo.application.interfaces import (
+    IAggregatorService,
+    IAggregatorServiceRegistry,
+    IUserPreferencesRepository,
+)
 from nodo.application.use_cases.search_torrents import SearchTorrents
 from nodo.domain.entities import TorrentSearchResult, UserPreferences
 from nodo.domain.exceptions import (
@@ -34,7 +38,7 @@ def test_search_torrents_success() -> None:
         date_found=datetime(2025, 1, 1, 12, 0, 0),
     )
 
-    mock_service1 = Mock()
+    mock_service1 = Mock(spec=IAggregatorService)
     mock_service1.source = AggregatorSource.from_string("1337x")
     mock_service1.search.return_value = [result1]
 
@@ -42,7 +46,7 @@ def test_search_torrents_success() -> None:
     mock_registry.get_service.return_value = mock_service1
     mock_registry.get_all_names.return_value = ["1337x"]
 
-    mock_prefs_repo = Mock()
+    mock_prefs_repo = Mock(spec=IUserPreferencesRepository)
     mock_prefs_repo.get.return_value = UserPreferences.create_default()
 
     use_case = SearchTorrents(
@@ -85,11 +89,11 @@ def test_search_torrents_multiple_aggregators() -> None:
         date_found=datetime(2025, 1, 1, 12, 0, 0),
     )
 
-    mock_service1 = Mock()
+    mock_service1 = Mock(spec=IAggregatorService)
     mock_service1.source = AggregatorSource.from_string("1337x")
     mock_service1.search.return_value = [result1]
 
-    mock_service2 = Mock()
+    mock_service2 = Mock(spec=IAggregatorService)
     mock_service2.source = AggregatorSource.from_string("ThePirateBay")
     mock_service2.search.return_value = [result2]
 
@@ -105,7 +109,7 @@ def test_search_torrents_multiple_aggregators() -> None:
     mock_registry.get_service.side_effect = get_service
     mock_registry.get_all_names.return_value = ["1337x", "ThePirateBay"]
 
-    mock_prefs_repo = Mock()
+    mock_prefs_repo = Mock(spec=IUserPreferencesRepository)
     mock_prefs_repo.get.return_value = UserPreferences.create_default()
 
     use_case = SearchTorrents(
@@ -151,11 +155,11 @@ def test_search_torrents_deduplicates_by_magnet_link() -> None:
         date_found=datetime(2025, 1, 1, 12, 0, 0),
     )
 
-    mock_service1 = Mock()
+    mock_service1 = Mock(spec=IAggregatorService)
     mock_service1.source = AggregatorSource.from_string("1337x")
     mock_service1.search.return_value = [result1]
 
-    mock_service2 = Mock()
+    mock_service2 = Mock(spec=IAggregatorService)
     mock_service2.source = AggregatorSource.from_string("ThePirateBay")
     mock_service2.search.return_value = [result2]
 
@@ -171,7 +175,7 @@ def test_search_torrents_deduplicates_by_magnet_link() -> None:
     mock_registry.get_service.side_effect = get_service
     mock_registry.get_all_names.return_value = ["1337x", "ThePirateBay"]
 
-    mock_prefs_repo = Mock()
+    mock_prefs_repo = Mock(spec=IUserPreferencesRepository)
     mock_prefs_repo.get.return_value = UserPreferences.create_default()
 
     use_case = SearchTorrents(
@@ -205,11 +209,11 @@ def test_search_torrents_uses_favorite_aggregators() -> None:
         date_found=datetime(2025, 1, 1, 12, 0, 0),
     )
 
-    mock_service = Mock()
+    mock_service = Mock(spec=IAggregatorService)
     mock_service.source = AggregatorSource.from_string("1337x")
     mock_service.search.return_value = [result]
 
-    mock_service2 = Mock()
+    mock_service2 = Mock(spec=IAggregatorService)
     mock_registry = Mock(spec=IAggregatorServiceRegistry)
 
     def get_service(name: str) -> Mock | None:
@@ -225,7 +229,7 @@ def test_search_torrents_uses_favorite_aggregators() -> None:
     preferences = UserPreferences.create_default()
     preferences.favorite_aggregators = [AggregatorSource.from_string("1337x")]
 
-    mock_prefs_repo = Mock()
+    mock_prefs_repo = Mock(spec=IUserPreferencesRepository)
     mock_prefs_repo.get.return_value = preferences
 
     use_case = SearchTorrents(
@@ -267,11 +271,11 @@ def test_search_torrents_uses_all_aggregators_when_no_favorites() -> None:
         date_found=datetime(2025, 1, 1, 12, 0, 0),
     )
 
-    mock_service1 = Mock()
+    mock_service1 = Mock(spec=IAggregatorService)
     mock_service1.source = AggregatorSource.from_string("1337x")
     mock_service1.search.return_value = [result1]
 
-    mock_service2 = Mock()
+    mock_service2 = Mock(spec=IAggregatorService)
     mock_service2.source = AggregatorSource.from_string("ThePirateBay")
     mock_service2.search.return_value = [result2]
 
@@ -287,7 +291,7 @@ def test_search_torrents_uses_all_aggregators_when_no_favorites() -> None:
     mock_registry.get_service.side_effect = get_service
     mock_registry.get_all_names.return_value = ["1337x", "ThePirateBay"]
 
-    mock_prefs_repo = Mock()
+    mock_prefs_repo = Mock(spec=IUserPreferencesRepository)
     mock_prefs_repo.get.return_value = UserPreferences.create_default()
 
     use_case = SearchTorrents(
@@ -319,11 +323,11 @@ def test_search_torrents_handles_aggregator_failure() -> None:
         date_found=datetime(2025, 1, 1, 12, 0, 0),
     )
 
-    mock_service1 = Mock()
+    mock_service1 = Mock(spec=IAggregatorService)
     mock_service1.source = AggregatorSource.from_string("1337x")
     mock_service1.search.return_value = [result]
 
-    mock_service2 = Mock()
+    mock_service2 = Mock(spec=IAggregatorService)
     mock_service2.source = AggregatorSource.from_string("ThePirateBay")
     mock_service2.search.side_effect = AggregatorError("Service failed")
 
@@ -339,7 +343,7 @@ def test_search_torrents_handles_aggregator_failure() -> None:
     mock_registry.get_service.side_effect = get_service
     mock_registry.get_all_names.return_value = ["1337x", "ThePirateBay"]
 
-    mock_prefs_repo = Mock()
+    mock_prefs_repo = Mock(spec=IUserPreferencesRepository)
     mock_prefs_repo.get.return_value = UserPreferences.create_default()
 
     use_case = SearchTorrents(
@@ -368,11 +372,11 @@ def test_search_torrents_raises_error_when_all_fail() -> None:
     """Should raise AggregatorError when all aggregators fail."""
     query = "test"
 
-    mock_service1 = Mock()
+    mock_service1 = Mock(spec=IAggregatorService)
     mock_service1.source = AggregatorSource.from_string("1337x")
     mock_service1.search.side_effect = AggregatorError("Service 1 failed")
 
-    mock_service2 = Mock()
+    mock_service2 = Mock(spec=IAggregatorService)
     mock_service2.source = AggregatorSource.from_string("ThePirateBay")
     mock_service2.search.side_effect = AggregatorError("Service 2 failed")
 
@@ -388,7 +392,7 @@ def test_search_torrents_raises_error_when_all_fail() -> None:
     mock_registry.get_service.side_effect = get_service
     mock_registry.get_all_names.return_value = ["1337x", "ThePirateBay"]
 
-    mock_prefs_repo = Mock()
+    mock_prefs_repo = Mock(spec=IUserPreferencesRepository)
     mock_prefs_repo.get.return_value = UserPreferences.create_default()
 
     use_case = SearchTorrents(
@@ -420,15 +424,15 @@ def test_search_torrents_tracks_multiple_failed_searches() -> None:
         date_found=datetime(2025, 1, 1, 12, 0, 0),
     )
 
-    mock_service1 = Mock()
+    mock_service1 = Mock(spec=IAggregatorService)
     mock_service1.source = AggregatorSource.from_string("1337x")
     mock_service1.search.return_value = [result]
 
-    mock_service2 = Mock()
+    mock_service2 = Mock(spec=IAggregatorService)
     mock_service2.source = AggregatorSource.from_string("ThePirateBay")
     mock_service2.search.side_effect = AggregatorError("TPB failed")
 
-    mock_service3 = Mock()
+    mock_service3 = Mock(spec=IAggregatorService)
     mock_service3.source = AggregatorSource.from_string("RARBG")
     mock_service3.search.side_effect = AggregatorTimeoutError("RARBG timeout")
 
@@ -446,7 +450,7 @@ def test_search_torrents_tracks_multiple_failed_searches() -> None:
     mock_registry.get_service.side_effect = get_service
     mock_registry.get_all_names.return_value = ["1337x", "ThePirateBay", "RARBG"]
 
-    mock_prefs_repo = Mock()
+    mock_prefs_repo = Mock(spec=IUserPreferencesRepository)
     mock_prefs_repo.get.return_value = UserPreferences.create_default()
 
     use_case = SearchTorrents(
@@ -491,7 +495,7 @@ def test_search_torrents_no_failed_searches_when_all_succeed() -> None:
         date_found=datetime(2025, 1, 1, 12, 0, 0),
     )
 
-    mock_service = Mock()
+    mock_service = Mock(spec=IAggregatorService)
     mock_service.source = AggregatorSource.from_string("1337x")
     mock_service.search.return_value = [result]
 
@@ -499,7 +503,7 @@ def test_search_torrents_no_failed_searches_when_all_succeed() -> None:
     mock_registry.get_service.return_value = mock_service
     mock_registry.get_all_names.return_value = ["1337x"]
 
-    mock_prefs_repo = Mock()
+    mock_prefs_repo = Mock(spec=IUserPreferencesRepository)
     mock_prefs_repo.get.return_value = UserPreferences.create_default()
 
     use_case = SearchTorrents(
@@ -522,7 +526,7 @@ def test_search_torrents_raises_error_for_empty_query() -> None:
     """Should raise ValidationError for empty query."""
     mock_registry = Mock(spec=IAggregatorServiceRegistry)
     mock_registry.get_all_names.return_value = ["1337x"]
-    mock_prefs_repo = Mock()
+    mock_prefs_repo = Mock(spec=IUserPreferencesRepository)
 
     use_case = SearchTorrents(
         aggregator_service_registry=mock_registry,
@@ -542,7 +546,7 @@ def test_search_torrents_raises_error_for_invalid_max_results() -> None:
     """Should raise ValidationError for invalid max_results."""
     mock_registry = Mock(spec=IAggregatorServiceRegistry)
     mock_registry.get_all_names.return_value = ["1337x"]
-    mock_prefs_repo = Mock()
+    mock_prefs_repo = Mock(spec=IUserPreferencesRepository)
 
     use_case = SearchTorrents(
         aggregator_service_registry=mock_registry,
@@ -561,7 +565,7 @@ def test_search_torrents_raises_error_for_invalid_aggregator_name() -> None:
     """Should raise ValidationError for invalid aggregator name."""
     mock_registry = Mock(spec=IAggregatorServiceRegistry)
     mock_registry.get_all_names.return_value = ["1337x", "ThePirateBay"]
-    mock_prefs_repo = Mock()
+    mock_prefs_repo = Mock(spec=IUserPreferencesRepository)
     mock_prefs_repo.get.return_value = UserPreferences.create_default()
 
     use_case = SearchTorrents(
@@ -585,7 +589,7 @@ def test_search_torrents_raises_error_for_multiple_invalid_aggregator_names() ->
     """Should raise ValidationError listing all invalid aggregator names."""
     mock_registry = Mock(spec=IAggregatorServiceRegistry)
     mock_registry.get_all_names.return_value = ["1337x", "ThePirateBay"]
-    mock_prefs_repo = Mock()
+    mock_prefs_repo = Mock(spec=IUserPreferencesRepository)
     mock_prefs_repo.get.return_value = UserPreferences.create_default()
 
     use_case = SearchTorrents(
@@ -610,7 +614,7 @@ def test_search_torrents_raises_error_for_mix_of_valid_and_invalid() -> None:
     """Should raise ValidationError even if some aggregator names are valid."""
     mock_registry = Mock(spec=IAggregatorServiceRegistry)
     mock_registry.get_all_names.return_value = ["1337x", "ThePirateBay"]
-    mock_prefs_repo = Mock()
+    mock_prefs_repo = Mock(spec=IUserPreferencesRepository)
     mock_prefs_repo.get.return_value = UserPreferences.create_default()
 
     use_case = SearchTorrents(
@@ -633,7 +637,7 @@ def test_search_torrents_raises_error_for_empty_aggregator_list() -> None:
     """Should raise ValidationError for empty aggregator list."""
     mock_registry = Mock(spec=IAggregatorServiceRegistry)
     mock_registry.get_all_names.return_value = ["1337x"]
-    mock_prefs_repo = Mock()
+    mock_prefs_repo = Mock(spec=IUserPreferencesRepository)
 
     use_case = SearchTorrents(
         aggregator_service_registry=mock_registry,
@@ -652,7 +656,7 @@ def test_search_torrents_raises_error_when_no_aggregators_available() -> None:
     """Should raise AggregatorError when no aggregators available."""
     mock_registry = Mock(spec=IAggregatorServiceRegistry)
     mock_registry.get_all_names.return_value = []
-    mock_prefs_repo = Mock()
+    mock_prefs_repo = Mock(spec=IUserPreferencesRepository)
     mock_prefs_repo.get.return_value = UserPreferences.create_default()
 
     use_case = SearchTorrents(
@@ -702,7 +706,7 @@ def test_search_torrents_sorts_by_seeders_descending() -> None:
         date_found=datetime(2025, 1, 1, 12, 0, 0),
     )
 
-    mock_service = Mock()
+    mock_service = Mock(spec=IAggregatorService)
     mock_service.source = AggregatorSource.from_string("1337x")
     mock_service.search.return_value = [result1, result2, result3]
 
@@ -710,7 +714,7 @@ def test_search_torrents_sorts_by_seeders_descending() -> None:
     mock_registry.get_service.return_value = mock_service
     mock_registry.get_all_names.return_value = ["1337x"]
 
-    mock_prefs_repo = Mock()
+    mock_prefs_repo = Mock(spec=IUserPreferencesRepository)
     mock_prefs_repo.get.return_value = UserPreferences.create_default()
 
     use_case = SearchTorrents(
@@ -742,11 +746,11 @@ def test_search_torrents_handles_timeout_error() -> None:
         date_found=datetime(2025, 1, 1, 12, 0, 0),
     )
 
-    mock_service1 = Mock()
+    mock_service1 = Mock(spec=IAggregatorService)
     mock_service1.source = AggregatorSource.from_string("1337x")
     mock_service1.search.return_value = [result]
 
-    mock_service2 = Mock()
+    mock_service2 = Mock(spec=IAggregatorService)
     mock_service2.source = AggregatorSource.from_string("ThePirateBay")
     mock_service2.search.side_effect = AggregatorTimeoutError("Search timed out")
 
@@ -762,7 +766,7 @@ def test_search_torrents_handles_timeout_error() -> None:
     mock_registry.get_service.side_effect = get_service
     mock_registry.get_all_names.return_value = ["1337x", "ThePirateBay"]
 
-    mock_prefs_repo = Mock()
+    mock_prefs_repo = Mock(spec=IUserPreferencesRepository)
     mock_prefs_repo.get.return_value = UserPreferences.create_default()
 
     use_case = SearchTorrents(
@@ -791,7 +795,7 @@ def test_search_torrents_propagates_non_aggregator_exceptions() -> None:
     """Should propagate non-AggregatorError exceptions."""
     query = "test"
 
-    mock_service = Mock()
+    mock_service = Mock(spec=IAggregatorService)
     mock_service.source = AggregatorSource.from_string("1337x")
     # Raise a non-AggregatorError exception
     mock_service.search.side_effect = ValueError("Unexpected error")
@@ -800,7 +804,7 @@ def test_search_torrents_propagates_non_aggregator_exceptions() -> None:
     mock_registry.get_service.return_value = mock_service
     mock_registry.get_all_names.return_value = ["1337x"]
 
-    mock_prefs_repo = Mock()
+    mock_prefs_repo = Mock(spec=IUserPreferencesRepository)
     mock_prefs_repo.get.return_value = UserPreferences.create_default()
 
     use_case = SearchTorrents(

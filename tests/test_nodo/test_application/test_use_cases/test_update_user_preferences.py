@@ -6,6 +6,7 @@ from unittest.mock import Mock
 
 import pytest
 
+from nodo.application.interfaces import IUserPreferencesRepository
 from nodo.application.use_cases.update_user_preferences import UpdateUserPreferences
 from nodo.domain.entities import UserPreferences
 from nodo.domain.exceptions import ValidationError
@@ -19,7 +20,7 @@ def test_update_user_preferences_updates_default_path() -> None:
         date_modified=datetime(2025, 1, 1, 12, 0, 0),
     )
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IUserPreferencesRepository)
     mock_repo.get.return_value = preferences
 
     use_case = UpdateUserPreferences(preferences_repository=mock_repo)
@@ -41,7 +42,7 @@ def test_update_user_preferences_updates_max_concurrent() -> None:
         max_concurrent_downloads=3,
     )
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IUserPreferencesRepository)
     mock_repo.get.return_value = preferences
 
     use_case = UpdateUserPreferences(preferences_repository=mock_repo)
@@ -61,7 +62,7 @@ def test_update_user_preferences_updates_auto_start() -> None:
         auto_start_downloads=True,
     )
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IUserPreferencesRepository)
     mock_repo.get.return_value = preferences
 
     use_case = UpdateUserPreferences(preferences_repository=mock_repo)
@@ -82,7 +83,7 @@ def test_update_user_preferences_updates_multiple_fields() -> None:
         auto_start_downloads=True,
     )
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IUserPreferencesRepository)
     mock_repo.get.return_value = preferences
 
     use_case = UpdateUserPreferences(preferences_repository=mock_repo)
@@ -107,7 +108,7 @@ def test_update_user_preferences_with_no_changes() -> None:
         auto_start_downloads=True,
     )
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IUserPreferencesRepository)
     mock_repo.get.return_value = preferences
 
     use_case = UpdateUserPreferences(preferences_repository=mock_repo)
@@ -127,7 +128,7 @@ def test_update_user_preferences_raises_validation_error_for_invalid_max() -> No
         max_concurrent_downloads=3,
     )
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IUserPreferencesRepository)
     mock_repo.get.return_value = preferences
 
     use_case = UpdateUserPreferences(preferences_repository=mock_repo)
@@ -148,7 +149,7 @@ def test_update_user_preferences_raises_validation_error_for_zero_max() -> None:
         max_concurrent_downloads=3,
     )
 
-    mock_repo = Mock()
+    mock_repo = Mock(spec=IUserPreferencesRepository)
     mock_repo.get.return_value = preferences
 
     use_case = UpdateUserPreferences(preferences_repository=mock_repo)
