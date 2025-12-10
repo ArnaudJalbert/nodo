@@ -121,7 +121,7 @@ nodo remove <download-id> --delete-files
 
 ## Next Steps
 
-- Read the [User Guide](user-guide/searching.md) for detailed usage instructions
+- Read the [User Guide](user-guide/coming_soon.md) for detailed usage instructions
 - Explore the [Architecture](architecture/overview.md) to understand how Nodo works
 - Check out the [Development Guide](development/setup.md) if you want to contribute
 

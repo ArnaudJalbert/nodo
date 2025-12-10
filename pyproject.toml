@@ -7,7 +7,7 @@ requires-python = ">=3.13"
 dependencies = []
 
 [project.scripts]
-nodo-docs = "nodo.infrastructure.docs:main"
+nodo-docs = "nodo.infrastructure.documentation.main:main"
 
 # Build system configuration
 [build-system]

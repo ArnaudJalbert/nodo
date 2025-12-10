@@ -1,228 +1,377 @@
-# Testing
+# Testing Guide
 
-Nodo follows a comprehensive testing strategy to ensure code quality and reliability.
+## 100% Test Coverage Mandate
 
-## Testing Philosophy
+**Every piece of code must have tests. This is NON-NEGOTIABLE.**
 
-- **100% test coverage** - All code must be tested
-- **Test in isolation** - Each layer tested independently
-- **Fast tests** - Unit tests should run quickly
-- **Clear test names** - Test names describe what they test
+### Coverage Requirements
 
-## Test Structure
+- ✅ **Domain Layer:** 100% - Pure logic, easy to test
+- ✅ **Application Layer:** 100% - Use `Mock(spec=Interface)`
+- ✅ **Interface Adapters:** 100% - Use `Mock(spec=Protocol)`
+- ✅ **Infrastructure Layer:** 100% - Integration tests where appropriate
 
-Tests mirror the source code structure:
+**No exceptions. No excuses.**
 
-```
-tests/
-└── nodo/
-    ├── domain/
-    │   ├── entities/
-    │   ├── value_objects/
-    │   └── exceptions/
-    ├── application/
-    │   └── dtos/
-    ├── interface_adapters/
-    └── infrastructure/
-```
+---
 
-## Running Tests
+## Test Style: Plain Functions
 
-### Run All Tests
+**Use plain pytest functions, NOT test classes.**
 
-```bash
-uv run pytest
-```
+```python
+# ✅ CORRECT - Plain functions
+def test_magnet_link_extracts_info_hash() -> None:
+    """Should extract info hash from magnet link."""
+    magnet = MagnetLink.from_string("magnet:?xt=urn:btih:abc123...")
+    assert magnet.info_hash == "abc123..."
 
-### Run with Coverage
+def test_magnet_link_rejects_invalid_uri() -> None:
+    """Should reject invalid magnet URI."""
+    with pytest.raises(ValidationError):
+        MagnetLink.from_string("invalid")
 
-```bash
-uv run pytest --cov=src --cov-report=term
+# ❌ WRONG - Do NOT use test classes
+class TestMagnetLink:
+    def test_extracts_info_hash(self) -> None:
+        ...
 ```
 
-### Run with HTML Coverage Report
+---
 
-```bash
-uv run pytest --cov=src --cov-report=html
-```
-
-Open `htmlcov/index.html` in your browser to view the report.
-
-### Run Specific Test Suite
-
-```bash
-# Domain layer tests
-uv run pytest tests/nodo/domain/
-
-# Application layer tests
-uv run pytest tests/nodo/application/
-```
-
-## Test Coverage Requirements
-
-- **Minimum coverage**: 100%
-- **Enforced in CI**: Coverage must not decrease
-- **New code**: Must include tests
-
-Check coverage:
-
-```bash
-uv run pytest --cov=src --cov-fail-under=100
-```
-
-## Writing Tests
+## Testing Strategy by Layer
 
 ### Domain Layer Tests
 
-Domain tests are straightforward - no mocks needed:
+**Test all pure business logic:**
+- Entities: All methods, business rules, validation
+- Value Objects: Creation, validation, immutability
+- No mocks needed (pure functions)
 
+**Example:**
 ```python
-def test_download_creation():
-    """Test creating a download entity."""
-    magnet = MagnetLink("magnet:?xt=urn:btih:...")
-    size = FileSize(1_500_000_000)
-    source = AggregatorSource("1337x")
-    
+def test_download_entity_creation() -> None:
+    """Should create Download with valid data."""
     download = Download(
-        magnet_link=magnet,
-        title="Test Download",
-        file_path=Path("/test"),
-        source=source,
-        size=size
+        id=uuid4(),
+        magnet_link=MagnetLink.from_string("magnet:?xt=urn:btih:abc123"),
+        title="Test",
+        file_path=FilePath("/downloads/test"),
+        source=AggregatorSource.from_string("1337x"),
+        status=DownloadStatus.DOWNLOADING,
+        date_added=datetime.now(),
+        date_completed=None,
+        size=FileSize.from_string("1.5 GB")
     )
-    
-    assert download.id_ is not None
     assert download.status == DownloadStatus.DOWNLOADING
-    assert download.date_added is not None
+
+def test_file_size_validates_negative() -> None:
+    """Should reject negative file sizes."""
+    with pytest.raises(ValidationError):
+        FileSize.from_bytes(-100)
 ```
+
+---
 
 ### Application Layer Tests
 
-Use mocks for dependencies:
+**Mock all dependencies with `Mock(spec=Interface)`:**
 
 ```python
-def test_add_download_use_case():
-    """Test adding a download."""
-    # Create mocks
-    download_repo = Mock(spec=IDownloadRepository)
-    torrent_client = Mock(spec=ITorrentClient)
-    preferences_repo = Mock(spec=IUserPreferencesRepository)
+from unittest.mock import Mock
+
+def test_add_download_use_case() -> None:
+    """Should add download successfully."""
+    # Arrange - Mock domain interfaces (ABC)
+    mock_repo = Mock(spec=IDownloadRepository)
+    mock_repo.exists.return_value = False
+    mock_repo.save.return_value = Mock()  # Returns saved entity
     
-    # Setup mocks
-    preferences_repo.get.return_value = UserPreferences(...)
-    torrent_client.add_torrent.return_value = "torrent_hash"
-    download_repo.exists_by_magnet_link.return_value = False
+    mock_client = Mock(spec=ITorrentClient)
+    mock_client.add_torrent.return_value = "torrent_123"
     
-    # Create use case
-    use_case = AddDownload(download_repo, torrent_client, preferences_repo)
+    mock_prefs_repo = Mock(spec=IUserPreferencesRepository)
+    mock_prefs_repo.get.return_value = UserPreferences.create_default()
     
-    # Execute
-    result = use_case.execute(magnet_link, "Test")
+    use_case = AddDownloadUseCase(
+        repository=mock_repo,
+        torrent_client=mock_client,
+        preferences_repository=mock_prefs_repo
+    )
+    
+    input_data = AddDownloadUseCase.InputData(
+        magnet_link="magnet:?xt=urn:btih:abc123...",
+        title="Test Download",
+        source="1337x",
+        size="1.5 GB"
+    )
+    
+    # Act
+    result = use_case.execute(input_data)
     
     # Assert
-    assert result is not None
-    download_repo.save.assert_called_once()
+    assert result.download.status == "DOWNLOADING"
+    mock_repo.exists.assert_called_once()
+    mock_repo.save.assert_called_once()
+    mock_client.add_torrent.assert_called_once()
+
+def test_add_download_duplicate_error() -> None:
+    """Should raise error for duplicate download."""
+    mock_repo = Mock(spec=IDownloadRepository)
+    mock_repo.exists.return_value = True  # Duplicate
+    
+    mock_client = Mock(spec=ITorrentClient)
+    mock_prefs_repo = Mock(spec=IUserPreferencesRepository)
+    
+    use_case = AddDownloadUseCase(
+        repository=mock_repo,
+        torrent_client=mock_client,
+        preferences_repository=mock_prefs_repo
+    )
+    
+    input_data = AddDownloadUseCase.InputData(
+        magnet_link="magnet:?xt=urn:btih:abc123...",
+        title="Test",
+        source="1337x",
+        size="1.5 GB"
+    )
+    
+    with pytest.raises(DuplicateDownloadError):
+        use_case.execute(input_data)
+    
+    # Verify client was never called
+    mock_client.add_torrent.assert_not_called()
 ```
 
-### Integration Tests
+---
 
-Test with real dependencies:
+### Interface Adapters Tests
+
+**Mock protocols with `Mock(spec=Protocol)`:**
 
 ```python
-def test_download_repository_integration(tmp_path):
-    """Test repository with real database."""
-    db_path = tmp_path / "test.db"
-    session = create_session(str(db_path))
-    repo = SQLiteDownloadRepository(session)
+def test_qbittorrent_client_add_torrent() -> None:
+    """Should add torrent via client."""
+    # Arrange - Mock external library using Protocol
+    mock_client = Mock(spec=QBittorrentClientProtocol)
+    mock_client.torrents_add.return_value = "abc123def456"
     
-    # Test operations
+    qbt_client = QBittorrentClient(client=mock_client)
+    
+    magnet = MagnetLink.from_string("magnet:?xt=urn:btih:abc123...")
+    path = FilePath("/downloads")
+    
+    # Act
+    torrent_id = qbt_client.add_torrent(magnet, path)
+    
+    # Assert
+    assert torrent_id == "abc123def456"
+    mock_client.torrents_add.assert_called_once_with(
+        urls=str(magnet),
+        save_path=str(path)
+    )
+
+def test_sqlite_repository_save() -> None:
+    """Should save download to database."""
+    # Arrange - Mock SQLAlchemy session
+    mock_session = Mock(spec=SessionProtocol)
+    repo = SQLiteDownloadRepository(session=mock_session)
+    
     download = Download(...)
-    repo.save(download)
     
-    found = repo.find_by_id(download.id_)
-    assert found is not None
-    assert found.title == download.title
+    # Act
+    result = repo.save(download)
+    
+    # Assert
+    mock_session.add.assert_called_once()
+    mock_session.commit.assert_called_once()
 ```
 
-## Test Fixtures
+---
 
-Use pytest fixtures for common setup:
+### Infrastructure Layer Tests
+
+**Integration tests with real or mocked components:**
+
+```python
+def test_search_controller_success() -> None:
+    """Should return search results."""
+    # Arrange - Mock use case
+    mock_use_case = Mock(spec=SearchTorrentsUseCase)
+    mock_use_case.execute.return_value = SearchTorrentsUseCase.OutputData(
+        results=[
+            TorrentSearchResultDTO(
+                title="Test",
+                size="1.5 GB",
+                seeders=100,
+                leechers=50,
+                source="1337x",
+                magnet_link="magnet:?...",
+                date_found=datetime.now()
+            )
+        ]
+    )
+    
+    controller = SearchController(search_use_case=mock_use_case)
+    
+    request = SearchTorrentsRequest(
+        query="ubuntu",
+        max_results=10
+    )
+    
+    # Act
+    response = controller.search(request)
+    
+    # Assert
+    assert not isinstance(response, ErrorResponse)
+    assert len(response.results) == 1
+    mock_use_case.execute.assert_called_once()
+
+def test_cli_command_integration(cli_runner):
+    """Integration test for CLI command."""
+    result = cli_runner.invoke(app, ["search", "ubuntu"])
+    assert result.exit_code == 0
+    assert "Search Results" in result.output
+```
+
+---
+
+## Test Coverage Tools
+
+```bash
+# Install
+uv add --dev pytest pytest-cov
+
+# Run tests with coverage
+pytest --cov=src --cov-report=html --cov-report=term
+
+# View HTML report
+open htmlcov/index.html
+
+# Fail if coverage below 100%
+pytest --cov=src --cov-fail-under=100
+```
+
+---
+
+## Test-Driven Development (TDD)
+
+**Recommended workflow:**
+
+1. ✅ Write test first (Red)
+2. ✅ Write minimal code to pass (Green)
+3. ✅ Refactor (Refactor)
+4. ✅ Repeat
+
+**Benefits:**
+- Forces you to think about API design
+- Ensures testable code
+- Built-in regression tests
+- 100% coverage by default
+
+---
+
+## Common Testing Patterns
+
+### Testing Exceptions
+
+```python
+def test_raises_validation_error() -> None:
+    """Should raise ValidationError for invalid input."""
+    with pytest.raises(ValidationError, match="Invalid magnet link"):
+        MagnetLink.from_string("invalid")
+```
+
+### Testing with Fixtures
 
 ```python
 @pytest.fixture
-def sample_download():
-    """Create a sample download for testing."""
-    return Download(
-        magnet_link=MagnetLink("magnet:?xt=urn:btih:..."),
-        title="Test",
-        file_path=Path("/test"),
-        source=AggregatorSource("1337x"),
-        size=FileSize(1000)
-    )
+def mock_repository():
+    """Fixture for mocked repository."""
+    repo = Mock(spec=IDownloadRepository)
+    repo.exists.return_value = False
+    return repo
+
+def test_with_fixture(mock_repository) -> None:
+    """Should use fixture."""
+    use_case = AddDownloadUseCase(repository=mock_repository, ...)
+    # Test here
 ```
 
-## Test Naming
-
-Follow this naming convention:
-
-- Test files: `test_<module_name>.py`
-- Test functions: `test_<what_is_tested>`
-
-Examples:
-- `test_download.py`
-- `test_download_creation()`
-- `test_download_status_transition()`
-
-## Parametrized Tests
-
-Use `@pytest.mark.parametrize` for testing multiple inputs:
+### Testing Async Code
 
 ```python
-@pytest.mark.parametrize("size_bytes,expected", [
-    (1000, "1.0 KB"),
-    (1_000_000, "1.0 MB"),
-    (1_000_000_000, "1.0 GB"),
+@pytest.mark.asyncio
+async def test_async_operation() -> None:
+    """Should handle async operation."""
+    result = await some_async_function()
+    assert result is not None
+```
+
+### Parametrized Tests
+
+```python
+@pytest.mark.parametrize("size_str,expected_bytes", [
+    ("1 KB", 1024),
+    ("1.5 MB", 1572864),
+    ("2 GB", 2147483648),
 ])
-def test_file_size_formatting(size_bytes, expected):
-    """Test file size formatting."""
-    size = FileSize(size_bytes)
-    assert size.human_readable() == expected
+def test_file_size_parsing(size_str: str, expected_bytes: int) -> None:
+    """Should parse various size formats."""
+    size = FileSize.from_string(size_str)
+    assert size.bytes == expected_bytes
 ```
 
-## Testing Exceptions
+---
 
-Test that exceptions are raised correctly:
+## Testing Checklist
 
-```python
-def test_duplicate_download_raises_error():
-    """Test adding duplicate download raises error."""
-    download_repo = Mock(spec=IDownloadRepository)
-    download_repo.exists_by_magnet_link.return_value = True
-    
-    use_case = AddDownload(...)
-    
-    with pytest.raises(DuplicateDownloadError):
-        use_case.execute(magnet_link, "Test")
+Before committing:
+
+```bash
+# 1. Format code
+ruff format .
+
+# 2. Check linting
+ruff check --fix .
+
+# 3. Run tests with coverage
+pytest --cov=src --cov-fail-under=100
+
+# 4. Check coverage report
+open htmlcov/index.html
 ```
 
-## Continuous Integration
+---
 
-Tests run automatically on:
-- Every pull request
-- Every push to main branch
-- Coverage is checked and must be 100%
+## No Excuses Policy
 
-## Best Practices
+❌ **"It's just a simple getter"** → **Test it**
+❌ **"It's just wiring code"** → **Test it**
+❌ **"It's hard to test"** → **Refactor to make it testable**
+❌ **"I'll add tests later"** → **NO. Add them NOW.**
 
-1. **One assertion per test** (when possible) - Makes failures clear
-2. **Arrange-Act-Assert** - Structure tests clearly
-3. **Test edge cases** - Boundary conditions, empty inputs, etc.
-4. **Test error cases** - Verify exceptions are raised
-5. **Keep tests fast** - Use mocks for slow operations
-6. **Test behavior, not implementation** - Test what, not how
+✅ **Test everything. 100% coverage. Non-negotiable.**
 
-## Next Steps
+---
 
-- [Development Setup](setup.md) - Set up your development environment
-- [Contributing](contributing.md) - Learn how to contribute
+## Benefits of 100% Coverage
 
+1. **Confidence** - Know your code works
+2. **Refactoring** - Change code without fear
+3. **Documentation** - Tests show how to use code
+4. **Regression Prevention** - Catch breaking changes
+5. **Better Design** - Forces modular, testable code
+
+---
+
+## Summary
+
+- **Use plain pytest functions**, not test classes
+- **Mock with `Mock(spec=Interface)` or `Mock(spec=Protocol)`**
+- **Test all layers** - Domain, Application, Interface Adapters, Infrastructure
+- **100% coverage required** - No exceptions
+- **TDD encouraged** - Write tests first
+- **Run tests before every commit**
+
+**If it's not tested, it's broken.**

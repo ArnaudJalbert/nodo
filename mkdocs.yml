@@ -56,20 +56,25 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Getting Started: getting-started.md
+  - Quick Reference: quick_references.md
   - User Guide:
-    - user-guide/searching.md
-    - user-guide/downloading.md
-    - user-guide/preferences.md
+    - user-guide/coming_soon.md
   - Architecture:
-    - architecture/overview.md
-    - architecture/domain.md
-    - architecture/application.md
-    - architecture/interface-adapters.md
-    - architecture/infrastructure.md
+    - Overview: architecture/overview.md
+    - Layers: architecture/layers.md
+    - Domain Model: architecture/domain.md
+    - Application Layer: architecture/application.md
+    - Interface Adapters: architecture/interface-adapters.md
+    - Infrastructure: architecture/infrastructure.md
+    - Use Cases: architecture/use_cases.md
+    - Dependency Injection: architecture/dependency_injection.md
+    - Project Structure: architecture/project_structure.md
   - Development:
-    - development/setup.md
-    - development/testing.md
-    - development/contributing.md
+    - Setup: development/setup.md
+    - Testing: development/testing.md
+    - Code Quality: development/code_quality.md
+    - Technology Stack: development/tech_stack.md
+    - Contributing: development/contributing.md
 
 plugins:
   - search

@@ -2,6 +2,12 @@
 
 The Infrastructure layer is the **outermost layer** containing framework-specific code, dependency injection, and the entry point of the application.
 
+## Current Status
+
+**Minimal Implementation** - Currently only contains a documentation server module.
+
+Most infrastructure components (CLI, DI container, configuration) are pending implementation.
+
 ## Principles
 
 - ✅ **Depends on all inner layers** - Can use Domain, Application, and Interface Adapters
@@ -13,9 +19,11 @@ The Infrastructure layer is the **outermost layer** containing framework-specifi
 
 ### CLI (Command-Line Interface)
 
-The CLI is built using [Typer](https://typer.tiangolo.com/) and provides the user-facing interface.
+**Status:** ⏳ To be implemented
 
-**Commands:**
+The CLI will be built using [Typer](https://typer.tiangolo.com/) and provides the user-facing interface.
+
+**Planned Commands:**
 - `search` - Search for torrents across aggregators
 - `add` - Add a new download
 - `list` - List all downloads
@@ -48,7 +56,9 @@ def search(query: str) -> None:
 
 ### Dependency Injection
 
-The DI container wires together all components, providing implementations to use cases.
+**Status:** ⏳ To be implemented
+
+The DI container will wire together all components, providing implementations to use cases.
 
 **Responsibilities:**
 - Create repository instances
@@ -90,14 +100,16 @@ class Container:
 
 ### Configuration Management
 
-Handles loading and managing configuration from files and environment variables.
+**Status:** ⏳ To be implemented
 
-**Configuration Sources:**
+Will handle loading and managing configuration from files and environment variables.
+
+**Planned Configuration Sources:**
 - `~/.config/nodo/config.toml` - User configuration file
 - Environment variables - Override file settings
 - Default values - Fallback when not configured
 
-**Configuration Options:**
+**Planned Configuration Options:**
 - `download_path` - Default download directory
 - `max_concurrent_downloads` - Maximum concurrent downloads
 - `auto_start_downloads` - Whether to auto-start downloads
@@ -129,7 +141,9 @@ def load_config() -> Config:
 
 ### Database Setup
 
-Handles database initialization, migrations, and connection management.
+**Status:** ⏳ To be implemented
+
+Will handle database initialization, migrations, and connection management.
 
 **Responsibilities:**
 - Create database if it doesn't exist
@@ -150,10 +164,12 @@ Infrastructure layer handles:
 
 ## Application Entry Point
 
-The main entry point initializes the infrastructure and starts the CLI:
+**Status:** ⏳ To be implemented
+
+The main entry point will initialize the infrastructure and start the CLI:
 
 ```python
-# src/nodo/infrastructure/__main__.py
+# src/nodo/infrastructure/__main__.py (to be implemented)
 def main():
     # Load configuration
     config = load_config()
@@ -163,6 +179,23 @@ def main():
     
     # Run CLI
     cli_app(container)
+```
+
+**Current Entry Point:**
+
+Currently, only the documentation server is available:
+
+```python
+# src/nodo/infrastructure/documentation/main.py
+def main():
+    """Serve MkDocs documentation."""
+    import subprocess
+    subprocess.run(["mkdocs", "serve"])
+```
+
+**Usage:**
+```bash
+uv run nodo-docs
 ```
 
 ## Testing
@@ -175,17 +208,29 @@ Infrastructure layer can be tested with:
 
 ## Project Structure
 
+**Current:**
+```
+src/nodo/infrastructure/
+├── documentation/
+│   ├── __init__.py
+│   └── main.py              # Documentation server entry point
+└── __init__.py
+```
+
+**Planned:**
 ```
 src/nodo/infrastructure/
 ├── cli/
-│   └── commands.py          # CLI command definitions
+│   └── commands.py          # CLI command definitions (to be implemented)
 ├── di/
-│   └── container.py         # Dependency injection container
+│   └── container.py         # Dependency injection container (to be implemented)
 ├── config/
-│   └── loader.py            # Configuration loading
+│   └── loader.py            # Configuration loading (to be implemented)
 ├── database/
-│   └── setup.py             # Database initialization
-└── __main__.py              # Application entry point
+│   └── setup.py             # Database initialization (to be implemented)
+├── documentation/
+│   └── main.py              # Documentation server ✅
+└── __main__.py              # Application entry point (to be implemented)
 ```
 
 ## Next Steps

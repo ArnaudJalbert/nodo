@@ -2,6 +2,12 @@
 
 The Interface Adapters layer implements the interfaces defined in the Application layer. It adapts data between the application's use cases and external systems like databases, APIs, and file systems.
 
+## Current Status
+
+**⏳ To Be Implemented** - This layer is currently empty (only contains `__init__.py`).
+
+The domain and application layers are complete, but the interface adapters that connect them to external systems are pending implementation.
+
 ## Principles
 
 - ✅ **Implements Application interfaces** - Concrete implementations of ABCs
@@ -13,11 +19,13 @@ The Interface Adapters layer implements the interfaces defined in the Applicatio
 
 ### Repository Implementations
 
+**Status:** ⏳ To be implemented
+
 Repositories provide persistence for domain entities. They implement the repository interfaces defined in the Application layer.
 
 #### SQLiteDownloadRepository
 
-SQLAlchemy-based implementation of `IDownloadRepository` using SQLite.
+**Planned:** SQLAlchemy-based implementation of `IDownloadRepository` using SQLite.
 
 **Responsibilities:**
 - Map `Download` entities to database records
@@ -45,7 +53,7 @@ class SQLiteDownloadRepository(IDownloadRepository):
 
 #### SQLiteUserPreferencesRepository
 
-SQLAlchemy-based implementation of `IUserPreferencesRepository` using SQLite.
+**Planned:** SQLAlchemy-based implementation of `IUserPreferencesRepository` using SQLite.
 
 **Responsibilities:**
 - Persist `UserPreferences` singleton
@@ -55,11 +63,13 @@ SQLAlchemy-based implementation of `IUserPreferencesRepository` using SQLite.
 
 ### Service Adapters
 
+**Status:** ⏳ To be implemented
+
 Service adapters implement interfaces for external services.
 
 #### QBittorrentAdapter
 
-Adapter for qBittorrent Web API, implementing `ITorrentClient`.
+**Planned:** Adapter for qBittorrent Web API, implementing `ITorrentClient`.
 
 **Responsibilities:**
 - Communicate with qBittorrent via HTTP API
@@ -87,14 +97,14 @@ class QBittorrentAdapter(ITorrentClient):
 
 #### Aggregator Adapters
 
-Adapters for various torrent aggregator websites, implementing `IAggregatorService`.
+**Planned:** Adapters for various torrent aggregator websites, implementing `IAggregatorService`.
 
 **Base Adapter:**
-- `AggregatorAdapter` - Base class with common functionality
+- `AggregatorAdapter` - Base class with common functionality (to be implemented)
 
 **Specific Implementations:**
-- `The1337xAdapter` - 1337x aggregator
-- `ThePirateBayAdapter` - ThePirateBay aggregator
+- `The1337xAdapter` - 1337x aggregator (to be implemented)
+- `ThePirateBayAdapter` - ThePirateBay aggregator (to be implemented)
 - (More aggregators as needed)
 
 **Responsibilities:**
@@ -162,12 +172,21 @@ Interface adapters can be tested with:
 
 ## Protocols
 
+**Status:** ⏳ To be implemented
+
 Protocols define structural typing for dependencies:
 
-- `SQLAlchemySessionProtocol` - Database session protocol
-- `QBittorrentClientProtocol` - qBittorrent API protocol
+- `SQLAlchemySessionProtocol` - Database session protocol (to be implemented)
+- `QBittorrentClientProtocol` - qBittorrent API protocol (to be implemented)
 
 **Location**: `src/nodo/interface_adapters/protocols/` (to be implemented)
+
+## Current Project Structure
+
+```
+src/nodo/interface_adapters/
+└── __init__.py  # Currently empty
+```
 
 ## Next Steps
 

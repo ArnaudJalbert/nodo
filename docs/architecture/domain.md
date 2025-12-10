@@ -1,184 +1,324 @@
-# Domain Layer
+# Domain Model
 
-The Domain layer is the **innermost layer** of the Clean Architecture. It contains the core business logic and is completely independent of external frameworks, databases, and UI concerns.
+## Entities
 
-## Principles
+### Download (Core Entity)
 
-- ✅ **No external dependencies** - Only Python standard library
-- ✅ **Pure business logic** - No I/O, no frameworks
-- ✅ **Most stable layer** - Rarely changes when external systems change
-- ✅ **Testable in isolation** - No mocks needed
-
-## Components
-
-### Entities
-
-Entities are the core business objects that encapsulate enterprise-wide business rules.
-
-#### Download
-
-The main persisted entity representing a torrent download.
+Represents a torrent that has been downloaded or is currently downloading.
 
 **Attributes:**
-- `id_`: UUID - Unique identifier
-- `magnet_link`: MagnetLink - The magnet link used to download
-- `title`: str - Name of the downloaded content
-- `file_path`: Path - Local file system path where content is saved
-- `source`: AggregatorSource - Which aggregator it was downloaded from
-- `status`: DownloadStatus - Current status (DOWNLOADING, COMPLETED, FAILED, PAUSED)
-- `size`: FileSize - Total size of the download
-- `date_added`: datetime - When the download was initiated
-- `date_completed`: datetime | None - When the download finished
+- `id_`: UUID - Primary key (auto-generated)
+- `magnet_link`: MagnetLink - Torrent identifier
+- `title`: str - Download name
+- `file_path`: Path - Local storage location (pathlib.Path)
+- `source`: AggregatorSource - Origin aggregator
+- `status`: DownloadStatus - Current state (default: DOWNLOADING)
+- `date_added`: datetime - When initiated (auto-generated)
+- `date_completed`: datetime | None - When finished
+- `size`: FileSize - Total size
 
-**Location**: `src/nodo/domain/entities/download.py`
+**DownloadStatus Enum:**
+- `DOWNLOADING` - In progress (auto-generated value)
+- `COMPLETED` - Finished (auto-generated value)
+- `FAILED` - Error occurred (auto-generated value)
+- `PAUSED` - Temporarily stopped (auto-generated value)
 
-#### TorrentSearchResult
+**Note:** Uses `enum.auto()` for values, accessed via `.name` property.
 
-An ephemeral entity representing a torrent found from an aggregator search. Not persisted to the database.
+---
+
+### TorrentSearchResult (Ephemeral)
+
+Represents search results from aggregators. Not persisted.
 
 **Attributes:**
-- `magnet_link`: MagnetLink - Unique identifier for the torrent
-- `title`: str - Name/title of the torrent
-- `size`: FileSize - File size of the torrent
+- `magnet_link`: MagnetLink - Unique identifier
+- `title`: str - Torrent name
+- `size`: FileSize - File size
 - `seeders`: int - Number of seeders
 - `leechers`: int - Number of leechers
-- `source`: AggregatorSource - Which aggregator it came from
-- `date_found`: datetime - When this result was retrieved
+- `source`: AggregatorSource - Which aggregator
+- `date_found`: datetime - When retrieved
 
-**Location**: `src/nodo/domain/entities/torrent_search_result.py`
+**Usage:** Exists in memory during search, converted to Download when selected.
 
-#### UserPreferences
+---
 
-A singleton entity representing user configuration and preferences.
+### UserPreferences (Singleton)
+
+Stores user configuration. Only one instance exists.
 
 **Attributes:**
-- `download_path`: Path - Default download path
-- `max_concurrent_downloads`: int - Maximum concurrent downloads
-- `auto_start_downloads`: bool - Whether to auto-start downloads
-- `favorite_paths`: list[Path] - Favorite download locations
-- `favorite_aggregators`: list[AggregatorSource] - Preferred aggregator sources
+- `id_`: UUID - Always `00000000-0000-0000-0000-000000000001` (well-known, `USER_PREFERENCES_ID`)
+- `default_download_path`: Path - Default save location (pathlib.Path)
+- `favorite_paths`: list[Path] - Quick-select locations
+- `favorite_aggregators`: list[AggregatorSource] - Preferred sources
+- `max_concurrent_downloads`: int - Simultaneous downloads (1-10, default: 3)
+- `auto_start_downloads`: bool - Auto-start on add (default: True)
+- `date_created`: datetime - Initial creation (auto-generated)
+- `date_modified`: datetime - Last update (auto-updated by decorator)
 
-**Location**: `src/nodo/domain/entities/user_preferences.py`
+**Business Rules:**
+- Singleton pattern (only one instance)
+- `default_download_path` must always be valid
+- `max_concurrent_downloads` between 1 and 10
+- Empty `favorite_aggregators` means use all available
+- All modifications update `date_modified`
 
-### Value Objects
-
-Value objects are immutable objects that represent domain concepts. They have no identity and are defined by their attributes.
-
-#### MagnetLink
-
-Represents a magnet URI with validation.
-
-**Location**: `src/nodo/domain/value_objects/magnet_link.py`
-
-**Features:**
-- Validates magnet URI format
-- Immutable
-
-#### FileSize
-
-Represents a file size with human-readable formatting.
-
-**Location**: `src/nodo/domain/value_objects/file_size.py`
-
-**Features:**
-- Stores size in bytes
-- Provides human-readable formatting (e.g., "1.5 GB")
-- Immutable
-
-#### DownloadStatus
-
-Enumeration representing the current status of a download.
-
-**Values:**
-- `DOWNLOADING` - The download is currently in progress
-- `COMPLETED` - The download has finished successfully
-- `FAILED` - The download has failed
-- `PAUSED` - The download has been paused by the user
-
-**Location**: `src/nodo/domain/value_objects/download_status.py`
-
-#### AggregatorSource
-
-Represents a torrent source/indexer name.
-
-**Location**: `src/nodo/domain/value_objects/aggregator_source.py`
-
-**Features:**
-- Validates source names
-- Examples: "1337x", "ThePirateBay"
-
-### Exceptions
-
-Domain-specific exceptions that represent business rule violations.
-
-#### Base Exception
-
-- `DomainException` - Base exception for all domain exceptions
-
-#### Validation Exceptions
-
-- `ValidationError` - Input validation failures
-
-#### Download Exceptions
-
-- `DownloadNotFoundError` - Download lookup failures
-- `DuplicateDownloadError` - Duplicate magnet link
-- `InvalidStateTransitionError` - Invalid status changes
-
-#### External Service Exceptions
-
-- `TorrentClientError` - Torrent client failures
-- `AggregatorError` - Aggregator search failures
-- `AggregatorTimeoutError` - Aggregator timeout
-
-#### System Exceptions
-
-- `FileSystemError` - File system operation failures
-
-**Location**: `src/nodo/domain/exceptions/`
-
-## Design Patterns
-
-### Dataclasses
-
-Entities use Python dataclasses with:
-- `slots=True` for memory efficiency
-- `kw_only=True` for explicit keyword arguments
-- `frozen=True` for value objects (immutability)
-
-### Factory Methods
-
-Entities may include factory methods for creating instances with sensible defaults.
-
-## Testing
-
-Domain layer code should have **100% test coverage**. Tests are located in `tests/nodo/domain/`.
-
-Since the domain layer has no external dependencies, tests are straightforward and don't require mocks.
-
-## Example Usage
-
+**Domain Methods:**
 ```python
-from nodo.domain.entities import Download
-from nodo.domain.value_objects import MagnetLink, FileSize, AggregatorSource, DownloadStatus
+def add_favorite_path(self, path: Path) -> bool  # Returns True if added
+def remove_favorite_path(self, path: Path) -> bool  # Returns True if removed
+def add_favorite_aggregator(self, source: AggregatorSource) -> bool  # Returns True if added
+def remove_favorite_aggregator(self, source: AggregatorSource) -> bool  # Returns True if removed
+def update_default_path(self, path: Path) -> None
+def update_max_concurrent_downloads(self, max_count: int) -> None
+def update_auto_start(self, enabled: bool) -> None
 
-# Create a download entity
-magnet = MagnetLink("magnet:?xt=urn:btih:...")
-size = FileSize(1_500_000_000)  # 1.5 GB
-source = AggregatorSource("1337x")
-
-download = Download(
-    magnet_link=magnet,
-    title="Ubuntu 24.04",
-    file_path=Path("/downloads/ubuntu"),
-    source=source,
-    size=size,
-    status=DownloadStatus.DOWNLOADING
-)
+@classmethod
+def create_default(cls) -> "UserPreferences"
 ```
 
-## Next Steps
+**Note:** Methods that modify state use the `@updates_modified_date` decorator to automatically update `date_modified`.
 
-- [Application Layer](application.md) - See how the domain is used by the application layer
-- [Interface Adapters](interface-adapters.md) - See how repositories persist domain entities
+---
 
+## Value Objects
+
+### MagnetLink
+
+Immutable magnet URI for BitTorrent.
+
+**Validation:**
+- Must start with `magnet:?`
+- Must contain `xt=urn:btih:` (info hash)
+- Info hash: 40 chars (SHA-1) or 64 chars (SHA-256)
+
+**Methods:**
+```python
+@classmethod
+def from_string(uri: str) -> MagnetLink
+def get_info_hash() -> str
+def __str__() -> str
+def __eq__(other) -> bool  # Compare by info hash
+```
+
+---
+
+### FileSize
+
+Immutable file size with human-readable formatting.
+
+**Storage:** Bytes (canonical)
+
+**Units:** B, KB, MB, GB, TB (1024-based)
+
+**Methods:**
+```python
+@classmethod
+def from_bytes(size: int) -> FileSize
+@classmethod
+def from_string(size: str) -> FileSize  # Parse "1.5 GB"
+def to_human_readable() -> str
+def __str__() -> str
+def __eq__(other) -> bool
+def __lt__(other) -> bool
+```
+
+---
+
+### FilePath
+
+The domain uses `pathlib.Path` directly (not a separate value object).
+
+**Why pathlib.Path:**
+- Built-in validation
+- Cross-platform
+- Rich API
+- Standard library (no external dependencies)
+
+**Usage in Domain:**
+- `Download.file_path: Path`
+- `UserPreferences.default_download_path: Path`
+- `UserPreferences.favorite_paths: list[Path]`
+
+**Common Operations:**
+```python
+path.exists() -> bool
+path.is_file() -> bool
+path.is_dir() -> bool
+path.parent -> Path
+path.name -> str
+path.resolve() -> Path
+```
+
+---
+
+### AggregatorSource
+
+Immutable source aggregator identifier.
+
+**Attributes:**
+- `name`: str - Canonical aggregator name
+
+**Validation:**
+- Non-empty
+- From known list
+- Case-insensitive but stored canonically
+
+**Supported Aggregators:**
+- `1337x`
+- `ThePirateBay`
+- `RARBG`
+- `Nyaa`
+- `TorrentGalaxy`
+- `LimeTorrents`
+
+**Methods:**
+```python
+@classmethod
+def from_string(name: str) -> AggregatorSource
+def __str__() -> str
+def __eq__(other) -> bool  # Case-insensitive
+```
+
+---
+
+### TimeDuration
+
+Immutable time duration with human-readable formatting.
+
+**Storage:** Seconds (canonical)
+
+**Methods:**
+```python
+@classmethod
+def from_seconds(seconds: int | None) -> TimeDuration | None
+def to_human_readable() -> str
+def __str__() -> str
+def __eq__(other) -> bool
+def __lt__(other) -> bool
+```
+
+**Example:**
+```python
+duration = TimeDuration.from_seconds(3661)
+print(duration)  # "1 hour 1 minute 1 second"
+```
+
+---
+
+## Domain Exceptions
+
+All exceptions inherit from `DomainError`:
+
+```python
+class DomainError(Exception):
+    """Base exception for all domain errors"""
+
+class ValidationError(DomainError):
+    """Invalid input"""
+
+class DownloadNotFoundError(DomainError):
+    """Download doesn't exist"""
+
+class DuplicateDownloadError(DomainError):
+    """Download already exists"""
+
+class InvalidStateTransitionError(DomainError):
+    """Invalid status change"""
+
+class TorrentClientError(DomainError):
+    """Torrent client operation failed"""
+
+class AggregatorError(DomainError):
+    """Aggregator search failed"""
+
+class AggregatorTimeoutError(AggregatorError):
+    """Aggregator search timeout"""
+
+class FileSystemError(DomainError):
+    """File system operation failed"""
+```
+
+**Location:** `src/nodo/domain/exceptions/`
+
+---
+
+## Entity Relationships
+
+```
+TorrentSearchResult (ephemeral)
+    ↓ user selects
+Download (persisted)
+    ↓ references
+UserPreferences (singleton)
+```
+
+**Key Points:**
+- TorrentSearchResult → Download when user adds
+- Download stores download-specific settings
+- UserPreferences stores global settings
+- No Download → TorrentSearchResult reverse relationship
+
+---
+
+## Design Principles
+
+1. **Separation of Concerns** - Each entity has one clear purpose
+2. **Immutability** - Value objects cannot change after creation
+3. **Validation** - Enforced at creation time
+4. **Domain Logic** - Business rules live in entities
+5. **No Infrastructure** - Domain layer has no external dependencies
+
+---
+
+## DTO Pattern
+
+DTOs transfer data between layers. Always defined as frozen dataclasses.
+
+**Standard DTO Structure:**
+```python
+from dataclasses import dataclass
+
+@dataclass(frozen=True, kw_only=True, slots=True)
+class DownloadDTO:
+    """Shared DTO for Download entity"""
+    id: str  # UUID as string
+    magnet_link: str
+    title: str
+    file_path: str
+    source: str
+    status: str
+    date_added: datetime
+    date_completed: datetime | None
+    size: str
+```
+
+**DTO Organization:**
+- **Shared DTOs** - `src/nodo/application/dtos/` (separate files: `download_dto.py`, `torrent_search_result_dto.py`)
+- **Use Case DTOs** - Inner classes named `Input` and `Output`
+
+**Example Use Case DTO:**
+```python
+class AddDownload:
+    @dataclass(frozen=True, slots=True, kw_only=True)
+    class Input:
+        magnet_link: str
+        title: str
+        source: str
+        size: str
+        file_path: str
+    
+    @dataclass(frozen=True, slots=True, kw_only=True)
+    class Output:
+        download: DownloadDTO
+```
+
+**Benefits:**
+- Encapsulation - DTOs tightly coupled to use case
+- Discoverability - Easy to find
+- Namespacing - No conflicts
+- Immutability - `frozen=True`
+- Type safety - `kw_only=True`
+- Memory efficient - `slots=True`

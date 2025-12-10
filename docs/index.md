@@ -48,7 +48,7 @@ This architecture ensures:
 ## Documentation
 
 - [Getting Started](getting-started.md) - Installation and quick start guide
-- [User Guide](user-guide/searching.md) - How to use Nodo
+- [User Guide](user-guide/coming_soon.md) - How to use Nodo
 - [Architecture](architecture/overview.md) - Deep dive into the architecture
 - [Development](development/setup.md) - Contributing and development setup
 

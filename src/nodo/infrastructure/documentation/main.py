@@ -13,7 +13,7 @@ def main() -> None:
     It automatically rebuilds when documentation files change.
     """
     # Get the project root (parent of src)
-    project_root = Path(__file__).parent.parent.parent.parent
+    project_root = Path(__file__).parent.parent.parent.parent.parent
 
     # Check if mkdocs.yml exists
     mkdocs_yml = project_root / "mkdocs.yml"
