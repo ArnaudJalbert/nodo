@@ -11,7 +11,12 @@ from nodo.domain.exceptions import (
     TorrentClientError,
     ValidationError,
 )
-from nodo.domain.value_objects import AggregatorSource, FileSize, MagnetLink
+from nodo.domain.value_objects import (
+    AggregatorSource,
+    DownloadState,
+    FileSize,
+    MagnetLink,
+)
 
 
 class AddDownload:
@@ -96,7 +101,7 @@ class AddDownload:
             )
 
         # Create Download entity
-        download = Download(
+        download: Download = Download(
             magnet_link=magnet_link,
             title=title,
             file_path=file_path,
@@ -112,8 +117,10 @@ class AddDownload:
             download_dir = str(file_path.parent)
             self._torrent_client.add_torrent(magnet_link, download_dir)
         except TorrentClientError as e:
-            # If client fails, we should still have the entity saved
-            # but re-raise the error so caller knows
+            # If client fails, update status to FAILED and save
+            download.status = DownloadState.FAILED
+            self._download_repository.save(download)
+            # Re-raise the error so caller knows
             raise TorrentClientError(
                 f"Failed to start download in torrent client: {e}"
             ) from e

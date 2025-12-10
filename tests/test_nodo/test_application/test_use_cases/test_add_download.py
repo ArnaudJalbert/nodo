@@ -16,7 +16,12 @@ from nodo.domain.exceptions import (
     TorrentClientError,
     ValidationError,
 )
-from nodo.domain.value_objects import AggregatorSource, FileSize, MagnetLink
+from nodo.domain.value_objects import (
+    AggregatorSource,
+    DownloadState,
+    FileSize,
+    MagnetLink,
+)
 
 
 def test_add_download_success() -> None:
@@ -230,8 +235,16 @@ def test_add_download_raises_error_for_torrent_client_failure() -> None:
     """Should raise TorrentClientError when client fails."""
     magnet_link_str = "magnet:?xt=urn:btih:" + "a" * 40
 
+    # Track the status at the time of each save call
+    saved_statuses = []
+
+    def capture_save(download: Download) -> None:
+        """Capture the status at the time of save."""
+        saved_statuses.append(download.status)
+
     mock_repo = Mock(spec=IDownloadRepository)
     mock_repo.exists_by_magnet_link.return_value = False
+    mock_repo.save.side_effect = capture_save
 
     mock_client = Mock(spec=ITorrentClient)
     mock_client.add_torrent.side_effect = TorrentClientError("Client error")
@@ -253,8 +266,67 @@ def test_add_download_raises_error_for_torrent_client_failure() -> None:
         use_case.execute(input_data)
 
     assert "torrent client" in str(exc_info.value).lower()
-    # Repository save should still be called (download entity created)
-    mock_repo.save.assert_called_once()
+    # Repository save should be called twice: once for initial save, once for FAILED status update
+    assert mock_repo.save.call_count == 2
+    # Verify the statuses at the time of each save call
+    assert saved_statuses[0] == DownloadState.DOWNLOADING
+    assert saved_statuses[1] == DownloadState.FAILED
+
+
+def test_add_download_sets_status_to_failed_on_torrent_client_error() -> None:
+    """Should set download status to FAILED when torrent client fails."""
+    magnet_link_str = "magnet:?xt=urn:btih:" + "a" * 40
+
+    # Track the status and download at the time of each save call
+    saved_downloads = []
+
+    def capture_save(download: Download) -> None:
+        """Capture the download at the time of save."""
+        saved_downloads.append(download)
+
+    mock_repo = Mock(spec=IDownloadRepository)
+    mock_repo.exists_by_magnet_link.return_value = False
+    mock_repo.save.side_effect = capture_save
+
+    mock_client = Mock(spec=ITorrentClient)
+    mock_client.add_torrent.side_effect = TorrentClientError("Connection failed")
+
+    use_case = AddDownload(
+        download_repository=mock_repo,
+        torrent_client=mock_client,
+    )
+
+    input_data = AddDownload.Input(
+        magnet_link=magnet_link_str,
+        title="Test Download",
+        source="1337x",
+        size="1 GB",
+        file_path="/downloads/test",
+    )
+
+    with pytest.raises(TorrentClientError):
+        use_case.execute(input_data)
+
+    # Verify save was called twice
+    assert mock_repo.save.call_count == 2
+    assert len(saved_downloads) == 2
+
+    # First save: initial download with DOWNLOADING status
+    # Note: We check the status that was captured at save time, not the current status
+    # Since it's the same object, we need to verify it's the same instance
+    first_download = saved_downloads[0]
+    second_download = saved_downloads[1]
+    
+    # Verify it's the same download entity (same ID)
+    assert first_download.id_ == second_download.id_
+    assert first_download.magnet_link.info_hash == second_download.magnet_link.info_hash
+    assert first_download.title == second_download.title
+    
+    # The second download will have FAILED status (since we modified the same object)
+    # We can't check the first one's status after modification, but we know:
+    # 1. It was saved initially (first call)
+    # 2. It was saved again with FAILED status (second call)
+    assert second_download.status == DownloadState.FAILED
 
 
 def test_to_dto_converts_correctly() -> None:
