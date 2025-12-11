@@ -177,9 +177,7 @@ class UseCase:
 
 ---
 
-### 5. RemoveDownload
-
-**Status:** ⏳ To be implemented
+### 5. RemoveDownload ✅
 
 **Purpose:** Remove download from tracking, optionally delete files
 
@@ -187,13 +185,21 @@ class UseCase:
 - `IDownloadRepository`
 - `ITorrentClient`
 
-**Planned Flow:**
+**Input:**
+- `download_id: str` - UUID of the download
+- `delete_files: bool` - Whether to delete downloaded files (default: False)
+
+**Output:**
+- `download: DownloadDTO` - The removed download
+- `removed: bool` - Whether the download was actually removed
+
+**Flow:**
 1. Validate UUID
 2. Retrieve download
 3. Remove from torrent client
-4. Delete files if `delete_files=True`
+4. Delete files if `delete_files=True` and client didn't handle it
 5. Delete from repository
-6. Return success
+6. Return DTO and removal status
 
 **Exceptions:**
 - `ValidationError` - Invalid UUID
@@ -203,9 +209,7 @@ class UseCase:
 
 ---
 
-### 6. PauseDownload
-
-**Status:** ⏳ To be implemented
+### 6. PauseDownload ✅
 
 **Purpose:** Pause an active download
 
@@ -213,7 +217,13 @@ class UseCase:
 - `IDownloadRepository`
 - `ITorrentClient`
 
-**Planned Flow:**
+**Input:**
+- `download_id: str` - UUID of the download
+
+**Output:**
+- `download: DownloadDTO` - The paused download
+
+**Flow:**
 1. Validate UUID
 2. Retrieve download
 3. Verify status is DOWNLOADING
@@ -230,9 +240,7 @@ class UseCase:
 
 ---
 
-### 7. ResumeDownload
-
-**Status:** ⏳ To be implemented
+### 7. ResumeDownload ✅
 
 **Purpose:** Resume a paused download
 
@@ -240,7 +248,13 @@ class UseCase:
 - `IDownloadRepository`
 - `ITorrentClient`
 
-**Planned Flow:**
+**Input:**
+- `download_id: str` - UUID of the download
+
+**Output:**
+- `download: DownloadDTO` - The resumed download
+
+**Flow:**
 1. Validate UUID
 2. Retrieve download
 3. Verify status is PAUSED
@@ -257,9 +271,7 @@ class UseCase:
 
 ---
 
-### 8. RefreshDownloads
-
-**Status:** ⏳ To be implemented
+### 8. RefreshDownloads ✅
 
 **Purpose:** Sync download statuses with torrent client (can be scheduled)
 
@@ -267,12 +279,21 @@ class UseCase:
 - `IDownloadRepository`
 - `ITorrentClient`
 
-**Planned Flow:**
+**Input:**
+- None - Refreshes all active downloads
+
+**Output:**
+- `updated_count: int` - Number of downloads updated
+- `error_count: int` - Number of errors encountered
+- `errors: tuple[str, ...]` - List of error messages
+
+**Flow:**
 1. Get all active downloads (DOWNLOADING, PAUSED)
 2. For each download:
    - Query `torrent_client.get_status()`
    - Compare with entity status
-   - Update if different (set COMPLETED if progress=100%)
+   - Update if different (set COMPLETED if is_complete=True)
+   - Set date_completed if newly completed
    - Save updated entity
    - Record errors but continue
 3. Return counts and errors

@@ -132,6 +132,10 @@ Use cases orchestrate the flow of data and coordinate domain entities to achieve
 - `AddDownload` - Add and start download
 - `ListDownloads` - List downloads with filtering and sorting
 - `GetDownloadStatus` - Get status and progress
+- `RemoveDownload` - Remove download with optional file deletion
+- `PauseDownload` - Pause an active download
+- `ResumeDownload` - Resume a paused download
+- `RefreshDownloads` - Sync download statuses with torrent client
 
 **Preferences Management:**
 - `GetUserPreferences` - Load user preferences
@@ -143,10 +147,7 @@ Use cases orchestrate the flow of data and coordinate domain entities to achieve
 
 #### To Be Implemented ⏳
 
-- `RemoveDownload` - Remove download
-- `PauseDownload` - Pause active download
-- `ResumeDownload` - Resume paused download
-- `RefreshDownloads` - Sync with torrent client
+- None - All planned use cases are now implemented
 
 **Location**: `src/nodo/application/use_cases/`
 
