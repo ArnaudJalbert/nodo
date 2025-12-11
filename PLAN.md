@@ -55,15 +55,15 @@ Nodo is a CLI-based torrent download manager built with Clean Architecture princ
 - [x] `AddFavoriteAggregator` - Add favorite source
 - [x] `RemoveFavoriteAggregator` - Remove favorite source
 
-### 2.4 Download Management Use Cases
+### 2.4 Download Management Use Cases ✅
 - [x] `SearchTorrents` - Search across aggregators with deduplication
 - [x] `AddDownload` - Add and start download
 - [x] `ListDownloads` - List downloads with filtering and sorting
-- [ ] `GetDownloadStatus` - Get status and progress
-- [ ] `RemoveDownload` - Remove download
-- [ ] `PauseDownload` - Pause active download
-- [ ] `ResumeDownload` - Resume paused download
-- [ ] `RefreshDownloads` - Sync with torrent client
+- [x] `GetDownloadStatus` - Get status and progress
+- [x] `RemoveDownload` - Remove download
+- [x] `PauseDownload` - Pause active download
+- [x] `ResumeDownload` - Resume paused download
+- [x] `RefreshDownloads` - Sync with torrent client
 
 ---
 

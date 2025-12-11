@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2025-12-08
+
+### Added
+
+- Download management use cases (Phase 2.4 completion)
+  - `RemoveDownload` - Remove download from tracking with optional file deletion
+  - `PauseDownload` - Pause an active download
+  - `ResumeDownload` - Resume a paused download
+  - `RefreshDownloads` - Sync download statuses with a torrent client
+- Comprehensive test suites for all new use cases with 100% coverage
+- Error handling for invalid state transitions (pause/resume)
+- Graceful error handling in RefreshDownloads (continues processing on individual failures)
+
+### Changed
+
+- `AddDownload` now sets download status to FAILED when a torrent client fails
+  - Improves error tracking by persisting the failure state
+  - Download entity is saved with FAILED status before the exception is raised
+- `AddFavoriteAggregator` now validates aggregator is supported
+  - Raises `ValidationError` for unsupported aggregators
+  - Provides a helpful error message with a list of supported aggregators
+
 ## [0.3.0] - 2025-12-08
 
 ### Added
