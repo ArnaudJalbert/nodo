@@ -1,6 +1,6 @@
 [project]
 name = "nodo"
-version = "0.5.0"
+version = "0.4.0"
 description = "Minimalist torrent download manager"
 readme = "README.md"
 requires-python = ">=3.13"
