@@ -8,20 +8,20 @@ from nodo.domain.entities import (
     UserPreferences,
 )
 from nodo.domain.exceptions import (
-    AggregatorError,
-    AggregatorTimeoutError,
     DomainError,
     DownloadNotFoundError,
     DuplicateDownloadError,
     FileSystemError,
+    IndexerError,
+    IndexerTimeoutError,
     InvalidStateTransitionError,
     TorrentClientError,
     ValidationError,
 )
 from nodo.domain.value_objects import (
-    AggregatorSource,
     DownloadState,
     FileSize,
+    IndexerSource,
     MagnetLink,
 )
 
@@ -33,18 +33,18 @@ __all__ = [
     "USER_PREFERENCES_ID",
     "UserPreferences",
     # Exceptions
-    "AggregatorError",
-    "AggregatorTimeoutError",
     "DomainError",
     "DownloadNotFoundError",
     "DuplicateDownloadError",
     "FileSystemError",
+    "IndexerError",
+    "IndexerTimeoutError",
     "InvalidStateTransitionError",
     "TorrentClientError",
     "ValidationError",
     # Value Objects
-    "AggregatorSource",
     "DownloadState",
     "FileSize",
+    "IndexerSource",
     "MagnetLink",
 ]

@@ -7,7 +7,7 @@ from unittest.mock import Mock
 from nodo.application.interfaces import IUserPreferencesRepository
 from nodo.application.use_cases.get_user_preferences import GetUserPreferences
 from nodo.domain.entities import UserPreferences
-from nodo.domain.value_objects import AggregatorSource
+from nodo.domain.value_objects import IndexerSource
 
 
 def test_get_user_preferences_returns_output() -> None:
@@ -15,7 +15,7 @@ def test_get_user_preferences_returns_output() -> None:
     preferences = UserPreferences(
         default_download_path=Path("/home/user/Downloads"),
         favorite_paths=[Path("/home/user/Movies")],
-        favorite_aggregators=[AggregatorSource(name="1337x")],
+        favorite_indexers=[IndexerSource(name="Prowlarr")],
         max_concurrent_downloads=5,
         auto_start_downloads=True,
         date_created=datetime(2025, 1, 1, 12, 0, 0),
@@ -31,7 +31,7 @@ def test_get_user_preferences_returns_output() -> None:
     assert isinstance(result, GetUserPreferences.Output)
     assert result.default_download_path == "/home/user/Downloads"
     assert result.favorite_paths == ("/home/user/Movies",)
-    assert result.favorite_aggregators == ("1337x",)
+    assert result.favorite_indexers == ("Prowlarr",)
     assert result.max_concurrent_downloads == 5
     assert result.auto_start_downloads is True
     mock_repo.get.assert_called_once()
@@ -49,7 +49,7 @@ def test_get_user_preferences_with_default_preferences() -> None:
 
     assert isinstance(result, GetUserPreferences.Output)
     assert result.favorite_paths == ()
-    assert result.favorite_aggregators == ()
+    assert result.favorite_indexers == ()
     assert result.max_concurrent_downloads == 3
     assert result.auto_start_downloads is True
 

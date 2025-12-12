@@ -18,9 +18,9 @@ from nodo.domain.exceptions import (
     ValidationError,
 )
 from nodo.domain.value_objects import (
-    AggregatorSource,
     DownloadState,
     FileSize,
+    IndexerSource,
     MagnetLink,
 )
 
@@ -36,7 +36,7 @@ def test_resume_download_success() -> None:
         magnet_link=magnet_link,
         title="Test Download",
         file_path=Path("/downloads/test"),
-        source=AggregatorSource.from_string("1337x"),
+        source=IndexerSource.from_string("Prowlarr"),
         size=FileSize.from_bytes(1024 * 1024),
         status=DownloadState.PAUSED,
     )
@@ -120,7 +120,7 @@ def test_resume_download_raises_error_for_invalid_status() -> None:
         magnet_link=magnet_link,
         title="Test Download",
         file_path=Path("/downloads/test"),
-        source=AggregatorSource.from_string("1337x"),
+        source=IndexerSource.from_string("Prowlarr"),
         size=FileSize.from_bytes(1024 * 1024),
         status=DownloadState.DOWNLOADING,  # Already downloading
     )
@@ -156,7 +156,7 @@ def test_resume_download_raises_error_for_completed_status() -> None:
         magnet_link=magnet_link,
         title="Test Download",
         file_path=Path("/downloads/test"),
-        source=AggregatorSource.from_string("1337x"),
+        source=IndexerSource.from_string("Prowlarr"),
         size=FileSize.from_bytes(1024 * 1024),
         status=DownloadState.COMPLETED,
     )
@@ -190,7 +190,7 @@ def test_resume_download_raises_error_for_torrent_client_failure() -> None:
         magnet_link=magnet_link,
         title="Test Download",
         file_path=Path("/downloads/test"),
-        source=AggregatorSource.from_string("1337x"),
+        source=IndexerSource.from_string("Prowlarr"),
         size=FileSize.from_bytes(1024 * 1024),
         status=DownloadState.PAUSED,
     )
@@ -225,7 +225,7 @@ def test_resume_download_raises_error_when_torrent_not_found_in_client() -> None
         magnet_link=magnet_link,
         title="Test Download",
         file_path=Path("/downloads/test"),
-        source=AggregatorSource.from_string("1337x"),
+        source=IndexerSource.from_string("Prowlarr"),
         size=FileSize.from_bytes(1024 * 1024),
         status=DownloadState.PAUSED,
     )
@@ -255,7 +255,7 @@ def test_to_dto_converts_correctly() -> None:
     download_id = uuid4()
     magnet_link = MagnetLink.from_string("magnet:?xt=urn:btih:" + "a" * 40)
     file_path = Path("/downloads/test")
-    source = AggregatorSource.from_string("1337x")
+    source = IndexerSource.from_string("Prowlarr")
     size = FileSize.from_bytes(1024 * 1024)
 
     download = Download(

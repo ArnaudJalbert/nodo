@@ -5,16 +5,16 @@ from nodo.application.dtos import (
     TorrentSearchResultDTO,
 )
 from nodo.application.interfaces import (
-    IAggregatorService,
     IDownloadRepository,
+    IndexerManager,
     ITorrentClient,
     IUserPreferencesRepository,
 )
 from nodo.application.use_cases import (
-    AddFavoriteAggregator,
+    AddFavoriteIndexer,
     AddFavoritePath,
     GetUserPreferences,
-    RemoveFavoriteAggregator,
+    RemoveFavoriteIndexer,
     RemoveFavoritePath,
     UpdateUserPreferences,
 )
@@ -25,17 +25,17 @@ __all__ = [
     "DownloadDTO",
     "TorrentSearchResultDTO",
     # Interfaces
-    "IAggregatorService",
     "IDownloadRepository",
+    "IndexerManager",
     "ITorrentClient",
     "IUserPreferencesRepository",
     # Domain Entities
     "DownloadStatus",
     # Use Cases
-    "AddFavoriteAggregator",
+    "AddFavoriteIndexer",
     "AddFavoritePath",
     "GetUserPreferences",
-    "RemoveFavoriteAggregator",
+    "RemoveFavoriteIndexer",
     "RemoveFavoritePath",
     "UpdateUserPreferences",
 ]

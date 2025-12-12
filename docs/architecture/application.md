@@ -39,31 +39,21 @@ Interface for user preferences persistence.
 
 **Location**: `src/nodo/application/interfaces/user_preferences_repository.py`
 
-#### IAggregatorService
+#### IndexerManager
 
-Interface for torrent aggregator search operations.
+Abstract base class for indexer manager services (e.g., Prowlarr).
 
-**Properties:**
-- `source: AggregatorSource` - The aggregator source this service represents (read-only property)
-
-**Methods:**
-- `search(query: str, max_results: int = 10) -> list[TorrentSearchResult]` - Search for torrents
+**Abstract Methods:**
+- `search(query: str, indexer_names: list[str] | None = None, max_results: int = 10) -> list[TorrentSearchResult]` - Search for torrents via indexer manager
+- `get_available_indexers() -> list[str]` - Get list of available indexers
 
 **Raises:**
-- `AggregatorError` - If the search fails
-- `AggregatorTimeoutError` - If the search times out
+- `IndexerError` - If the search fails
+- `IndexerTimeoutError` - If the search times out
 
-**Location**: `src/nodo/application/interfaces/aggregator_service.py`
+**Location**: `src/nodo/application/interfaces/indexer_manager.py`
 
-#### IAggregatorServiceRegistry
-
-Interface for accessing aggregator services by name.
-
-**Methods:**
-- `get_service(aggregator_name: str) -> IAggregatorService | None` - Get service by name
-- `get_all_names() -> list[str]` - Get all available aggregator names
-
-**Location**: `src/nodo/application/interfaces/aggregator_service_registry.py`
+**Note:** Currently only Prowlarr is supported via `ProwlarrIndexerManager` adapter.
 
 #### ITorrentClient
 

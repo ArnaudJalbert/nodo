@@ -5,7 +5,7 @@ from datetime import datetime
 import pytest
 
 from nodo.domain.entities import TorrentSearchResult
-from nodo.domain.value_objects import AggregatorSource, FileSize, MagnetLink
+from nodo.domain.value_objects import FileSize, IndexerSource, MagnetLink
 
 
 def test_torrent_search_result_create_with_all_fields() -> None:
@@ -14,7 +14,7 @@ def test_torrent_search_result_create_with_all_fields() -> None:
         uri="magnet:?xt=urn:btih:1234567890abcdef1234567890abcdef12345678"
     )
     size = FileSize(bytes_=1024 * 1024 * 700)
-    source = AggregatorSource(name="1337x")
+    source = IndexerSource(name="Prowlarr")
     date_found = datetime(2025, 1, 15, 10, 30, 0)
 
     result = TorrentSearchResult(
@@ -46,7 +46,7 @@ def test_torrent_search_result_is_immutable() -> None:
         size=FileSize(bytes_=1024),
         seeders=50,
         leechers=5,
-        source=AggregatorSource(name="1337x"),
+        source=IndexerSource(name="Prowlarr"),
         date_found=datetime.now(),
     )
 
@@ -65,7 +65,7 @@ def test_torrent_search_result_requires_keyword_arguments() -> None:
             FileSize(bytes_=1024),
             50,
             5,
-            AggregatorSource(name="1337x"),
+            IndexerSource(name="Prowlarr"),
             datetime.now(),
         )
 
@@ -76,7 +76,7 @@ def test_torrent_search_result_equality() -> None:
         uri="magnet:?xt=urn:btih:1234567890abcdef1234567890abcdef12345678"
     )
     size = FileSize(bytes_=1024)
-    source = AggregatorSource(name="1337x")
+    source = IndexerSource(name="Prowlarr")
     date = datetime(2025, 1, 15)
 
     result1 = TorrentSearchResult(
@@ -116,7 +116,7 @@ def test_torrent_search_result_equality_by_magnet_link_only() -> None:
         size=FileSize(bytes_=1024),
         seeders=50,
         leechers=5,
-        source=AggregatorSource(name="1337x"),
+        source=IndexerSource(name="Prowlarr"),
         date_found=datetime(2025, 1, 15),
     )
     result2 = TorrentSearchResult(
@@ -125,7 +125,7 @@ def test_torrent_search_result_equality_by_magnet_link_only() -> None:
         size=FileSize(bytes_=2048),  # Different size
         seeders=100,  # Different seeders
         leechers=10,  # Different leechers
-        source=AggregatorSource(name="ThePirateBay"),  # Different source
+        source=IndexerSource(name="Prowlarr"),  # Different source
         date_found=datetime(2025, 1, 16),  # Different date
     )
 
@@ -149,7 +149,7 @@ def test_torrent_search_result_hashable() -> None:
         size=FileSize(bytes_=1024),
         seeders=50,
         leechers=5,
-        source=AggregatorSource(name="1337x"),
+        source=IndexerSource(name="Prowlarr"),
         date_found=datetime(2025, 1, 15),
     )
     result2 = TorrentSearchResult(
@@ -158,7 +158,7 @@ def test_torrent_search_result_hashable() -> None:
         size=FileSize(bytes_=2048),
         seeders=100,
         leechers=10,
-        source=AggregatorSource(name="ThePirateBay"),
+        source=IndexerSource(name="Prowlarr"),
         date_found=datetime(2025, 1, 16),
     )
     result3 = TorrentSearchResult(
@@ -167,7 +167,7 @@ def test_torrent_search_result_hashable() -> None:
         size=FileSize(bytes_=4096),  # Different size
         seeders=200,  # Different seeders
         leechers=20,  # Different leechers
-        source=AggregatorSource(name="RARBG"),  # Different source
+        source=IndexerSource(name="Prowlarr"),  # Different source
         date_found=datetime(2025, 1, 17),  # Different date
     )
 
@@ -194,7 +194,7 @@ def test_torrent_search_result_equality_with_different_type() -> None:
         size=FileSize(bytes_=1024),
         seeders=50,
         leechers=5,
-        source=AggregatorSource(name="1337x"),
+        source=IndexerSource(name="Prowlarr"),
         date_found=datetime(2025, 1, 15),
     )
 

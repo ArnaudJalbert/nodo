@@ -5,6 +5,53 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2025-12-11
+
+### Changed
+
+- **BREAKING:** Renamed `MagnetLink` to `TorrentLink` to reflect support for multiple URL formats
+  - Now accepts magnet:, http:, and https: URL schemes
+  - `info_hash` property now returns `str | None` (None for non-magnet URLs)
+  - Equality comparison falls back to full URI comparison when info_hash unavailable
+  - Backward compatibility: `MagnetLink` is now an alias for `TorrentLink`
+
+### Added
+
+- Support for HTTP/HTTPS torrent file URLs in addition to magnet links
+- Better Prowlarr integration - no longer skips results with HTTP URLs in guid field
+- Prowlarr indexer manager integration
+  - `ProwlarrIndexerManager` - Concrete implementation of `IndexerManager` for Prowlarr API
+  - `IProwlarrSource` - Protocol defining raw Prowlarr API boundary in interface adapters layer
+  - `ProwlarrAdapter` - Infrastructure layer HTTP client for Prowlarr API
+- Comprehensive indexer manager architecture with clean separation of concerns
+  - Infrastructure layer returns raw data (dicts)
+  - Interface adapters handle mapping to domain entities
+  - Application layer works with abstract `IndexerManager` interface
+
+### Changed
+
+- **Architecture Refactoring** - Complete migration from aggregator pattern to indexer manager pattern
+  - Replaced `IAggregatorService` and `IAggregatorServiceRegistry` with generic `IndexerManager` ABC
+  - Replaced `AggregatorSource` with `IndexerSource` value object
+  - Renamed `AggregatorError` and `AggregatorTimeoutError` to `IndexerError` and `IndexerTimeoutError`
+  - Updated `SearchTorrents` use case to use `IndexerManager` instead of aggregator registry
+  - Renamed `UserPreferences.favorite_aggregators` to `UserPreferences.favorite_indexers`
+- **IndexerSource Value Object** - Now only supports Prowlarr
+  - Reduced supported indexers list to Prowlarr only (future-proof for adding more)
+  - Updated validation and canonical name handling
+- **Documentation** - Complete update to reflect new architecture
+  - Updated architecture overview with new indexer manager pattern
+  - Updated domain layer documentation with IndexerSource details
+  - Updated application layer documentation with IndexerManager ABC
+  - Rewrote interface adapters documentation with Prowlarr specifics
+  - Updated infrastructure documentation
+
+### Fixed
+
+- Test coverage - Updated all tests to use Prowlarr as the only supported indexer
+  - Updated 292 tests across all layers
+  - Maintained 100% code coverage throughout refactoring
+
 ## [0.4.0] - 2025-12-08
 
 ### Added

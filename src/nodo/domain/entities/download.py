@@ -6,10 +6,10 @@ from pathlib import Path
 from uuid import UUID, uuid4
 
 from nodo.domain.value_objects import (
-    AggregatorSource,
     DownloadState,
     FileSize,
-    MagnetLink,
+    IndexerSource,
+    TorrentLink,
 )
 
 
@@ -22,20 +22,20 @@ class Download:
 
     Attributes:
         id_: Unique identifier (primary key).
-        magnet_link: The magnet link used to download.
+        magnet_link: The torrent link used to download (magnet URI or HTTP/HTTPS URL).
         title: Name of the downloaded content.
         file_path: Local file system path where content is saved.
-        source: Which aggregator it was downloaded from.
+        source: Which indexer it was downloaded from.
         status: Current status of the download.
         date_added: When the download was initiated.
         date_completed: When the download finished (None if not completed).
         size: Total size of the download.
     """
 
-    magnet_link: MagnetLink
+    magnet_link: TorrentLink
     title: str
     file_path: Path
-    source: AggregatorSource
+    source: IndexerSource
     size: FileSize
     id_: UUID = field(default_factory=uuid4)
     status: DownloadState = DownloadState.DOWNLOADING

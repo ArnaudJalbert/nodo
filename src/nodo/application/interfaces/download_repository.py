@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from uuid import UUID
 
 from nodo.domain.entities import Download
-from nodo.domain.value_objects import DownloadState, MagnetLink
+from nodo.domain.value_objects import DownloadState, TorrentLink
 
 
 class IDownloadRepository(ABC):
@@ -38,11 +38,11 @@ class IDownloadRepository(ABC):
         """
 
     @abstractmethod
-    def find_by_magnet_link(self, magnet_link: MagnetLink) -> Download | None:
-        """Find a download by its magnet link.
+    def find_by_magnet_link(self, magnet_link: TorrentLink) -> Download | None:
+        """Find a download by its torrent link.
 
         Args:
-            magnet_link: The magnet link to search for.
+            magnet_link: The torrent link (magnet URI or HTTP/HTTPS URL) to search for.
 
         Returns:
             The download if found, None otherwise.
@@ -71,11 +71,11 @@ class IDownloadRepository(ABC):
         """
 
     @abstractmethod
-    def exists_by_magnet_link(self, magnet_link: MagnetLink) -> bool:
-        """Check if a download with the given magnet link exists.
+    def exists_by_magnet_link(self, magnet_link: TorrentLink) -> bool:
+        """Check if a download with the given torrent link exists.
 
         Args:
-            magnet_link: The magnet link to check.
+            magnet_link: The torrent link (magnet URI or HTTP/HTTPS URL) to check.
 
         Returns:
             True if a download exists, False otherwise.

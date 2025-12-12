@@ -17,7 +17,7 @@ def test_download_dto_create_with_all_fields() -> None:
         magnet_link="magnet:?xt=urn:btih:1234567890abcdef1234567890abcdef12345678",
         title="Ubuntu 24.04 LTS",
         file_path="/downloads/ubuntu.iso",
-        source="1337x",
+        source="Prowlarr",
         status="DOWNLOADING",
         date_added=date_added,
         date_completed=date_completed,
@@ -31,7 +31,7 @@ def test_download_dto_create_with_all_fields() -> None:
     )
     assert dto.title == "Ubuntu 24.04 LTS"
     assert dto.file_path == "/downloads/ubuntu.iso"
-    assert dto.source == "1337x"
+    assert dto.source == "Prowlarr"
     assert dto.status == "DOWNLOADING"
     assert dto.date_added == date_added
     assert dto.date_completed == date_completed
@@ -47,7 +47,7 @@ def test_download_dto_create_without_date_completed() -> None:
         magnet_link="magnet:?xt=urn:btih:1234567890abcdef1234567890abcdef12345678",
         title="Ubuntu 24.04 LTS",
         file_path="/downloads/ubuntu.iso",
-        source="1337x",
+        source="Prowlarr",
         status="DOWNLOADING",
         date_added=date_added,
         date_completed=None,
@@ -66,7 +66,7 @@ def test_download_dto_is_frozen() -> None:
         magnet_link="magnet:?xt=urn:btih:1234567890abcdef1234567890abcdef12345678",
         title="Ubuntu 24.04 LTS",
         file_path="/downloads/ubuntu.iso",
-        source="1337x",
+        source="Prowlarr",
         status="DOWNLOADING",
         date_added=date_added,
         date_completed=None,
@@ -86,7 +86,7 @@ def test_download_dto_equality() -> None:
         magnet_link="magnet:?xt=urn:btih:1234567890abcdef1234567890abcdef12345678",
         title="Ubuntu 24.04 LTS",
         file_path="/downloads/ubuntu.iso",
-        source="1337x",
+        source="Prowlarr",
         status="DOWNLOADING",
         date_added=date_added,
         date_completed=None,
@@ -98,7 +98,7 @@ def test_download_dto_equality() -> None:
         magnet_link="magnet:?xt=urn:btih:1234567890abcdef1234567890abcdef12345678",
         title="Ubuntu 24.04 LTS",
         file_path="/downloads/ubuntu.iso",
-        source="1337x",
+        source="Prowlarr",
         status="DOWNLOADING",
         date_added=date_added,
         date_completed=None,
@@ -118,7 +118,7 @@ def test_download_dto_different_values_not_equal() -> None:
         magnet_link="magnet:?xt=urn:btih:1234567890abcdef1234567890abcdef12345678",
         title="Ubuntu 24.04 LTS",
         file_path="/downloads/ubuntu.iso",
-        source="1337x",
+        source="Prowlarr",
         status="DOWNLOADING",
         date_added=date_added,
         date_completed=None,
@@ -130,7 +130,7 @@ def test_download_dto_different_values_not_equal() -> None:
         magnet_link="magnet:?xt=urn:btih:1234567890abcdef1234567890abcdef12345678",
         title="Different Title",
         file_path="/downloads/ubuntu.iso",
-        source="1337x",
+        source="Prowlarr",
         status="DOWNLOADING",
         date_added=date_added,
         date_completed=None,

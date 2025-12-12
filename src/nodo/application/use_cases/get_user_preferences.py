@@ -21,7 +21,7 @@ class GetUserPreferences:
             id_: Unique identifier as string.
             default_download_path: Default path to save downloads.
             favorite_paths: User's favorite download locations as strings.
-            favorite_aggregators: Preferred torrent sources as strings.
+            favorite_indexers: Preferred torrent sources as strings.
             max_concurrent_downloads: Maximum simultaneous downloads.
             auto_start_downloads: Auto-start downloads on add.
             date_created: When preferences were first created.
@@ -31,7 +31,7 @@ class GetUserPreferences:
         id_: str
         default_download_path: str
         favorite_paths: tuple[str, ...]
-        favorite_aggregators: tuple[str, ...]
+        favorite_indexers: tuple[str, ...]
         max_concurrent_downloads: int
         auto_start_downloads: bool
         date_created: datetime
@@ -59,8 +59,8 @@ class GetUserPreferences:
             id_=str(preferences.id_),
             default_download_path=str(preferences.default_download_path),
             favorite_paths=tuple(str(path) for path in preferences.favorite_paths),
-            favorite_aggregators=tuple(
-                str(source) for source in preferences.favorite_aggregators
+            favorite_indexers=tuple(
+                str(source) for source in preferences.favorite_indexers
             ),
             max_concurrent_downloads=preferences.max_concurrent_downloads,
             auto_start_downloads=preferences.auto_start_downloads,

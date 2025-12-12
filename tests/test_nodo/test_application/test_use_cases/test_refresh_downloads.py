@@ -10,9 +10,9 @@ from nodo.application.use_cases.refresh_downloads import RefreshDownloads
 from nodo.domain.entities import Download, DownloadStatus
 from nodo.domain.exceptions import TorrentClientError
 from nodo.domain.value_objects import (
-    AggregatorSource,
     DownloadState,
     FileSize,
+    IndexerSource,
     MagnetLink,
 )
 
@@ -27,7 +27,7 @@ def test_refresh_downloads_updates_status() -> None:
         magnet_link=magnet_link1,
         title="Download 1",
         file_path=Path("/downloads/test1"),
-        source=AggregatorSource.from_string("1337x"),
+        source=IndexerSource.from_string("Prowlarr"),
         size=FileSize.from_bytes(1024 * 1024),
         status=DownloadState.DOWNLOADING,
     )
@@ -37,7 +37,7 @@ def test_refresh_downloads_updates_status() -> None:
         magnet_link=magnet_link2,
         title="Download 2",
         file_path=Path("/downloads/test2"),
-        source=AggregatorSource.from_string("1337x"),
+        source=IndexerSource.from_string("Prowlarr"),
         size=FileSize.from_bytes(2048 * 1024),
         status=DownloadState.PAUSED,
     )
@@ -100,7 +100,7 @@ def test_refresh_downloads_no_updates_when_status_unchanged() -> None:
         magnet_link=magnet_link,
         title="Download",
         file_path=Path("/downloads/test"),
-        source=AggregatorSource.from_string("1337x"),
+        source=IndexerSource.from_string("Prowlarr"),
         size=FileSize.from_bytes(1024 * 1024),
         status=DownloadState.DOWNLOADING,
     )
@@ -143,7 +143,7 @@ def test_refresh_downloads_handles_torrent_not_found() -> None:
         magnet_link=magnet_link,
         title="Download",
         file_path=Path("/downloads/test"),
-        source=AggregatorSource.from_string("1337x"),
+        source=IndexerSource.from_string("Prowlarr"),
         size=FileSize.from_bytes(1024 * 1024),
         status=DownloadState.DOWNLOADING,
     )
@@ -177,7 +177,7 @@ def test_refresh_downloads_handles_client_errors_gracefully() -> None:
         magnet_link=magnet_link1,
         title="Download 1",
         file_path=Path("/downloads/test1"),
-        source=AggregatorSource.from_string("1337x"),
+        source=IndexerSource.from_string("Prowlarr"),
         size=FileSize.from_bytes(1024 * 1024),
         status=DownloadState.DOWNLOADING,
     )
@@ -187,7 +187,7 @@ def test_refresh_downloads_handles_client_errors_gracefully() -> None:
         magnet_link=magnet_link2,
         title="Download 2",
         file_path=Path("/downloads/test2"),
-        source=AggregatorSource.from_string("1337x"),
+        source=IndexerSource.from_string("Prowlarr"),
         size=FileSize.from_bytes(2048 * 1024),
         status=DownloadState.DOWNLOADING,
     )
@@ -242,7 +242,7 @@ def test_refresh_downloads_updates_paused_to_downloading() -> None:
         magnet_link=magnet_link,
         title="Download",
         file_path=Path("/downloads/test"),
-        source=AggregatorSource.from_string("1337x"),
+        source=IndexerSource.from_string("Prowlarr"),
         size=FileSize.from_bytes(1024 * 1024),
         status=DownloadState.PAUSED,
     )
@@ -288,7 +288,7 @@ def test_refresh_downloads_sets_date_completed() -> None:
         magnet_link=magnet_link,
         title="Download",
         file_path=Path("/downloads/test"),
-        source=AggregatorSource.from_string("1337x"),
+        source=IndexerSource.from_string("Prowlarr"),
         size=FileSize.from_bytes(1024 * 1024),
         status=DownloadState.DOWNLOADING,
         date_completed=None,

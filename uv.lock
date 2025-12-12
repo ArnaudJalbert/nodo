@@ -402,8 +402,11 @@ wheels = [
 
 [[package]]
 name = "nodo"
-version = "0.4.0"
+version = "0.5.0"
 source = { editable = "." }
+dependencies = [
+    { name = "requests" },
+]
 
 [package.dev-dependencies]
 dev = [
@@ -416,15 +419,16 @@ dev = [
 ]
 
 [package.metadata]
+requires-dist = [{ name = "requests", specifier = ">=2.31.0,<3" }]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "mkdocs", specifier = ">=1.6.0" },
-    { name = "mkdocs-material", specifier = ">=9.5.0" },
-    { name = "mkdocstrings", extras = ["python"], specifier = ">=0.24.0" },
-    { name = "pytest", specifier = ">=9.0.2" },
-    { name = "pytest-cov", specifier = ">=7.0.0" },
-    { name = "ruff", specifier = ">=0.14.8" },
+    { name = "mkdocs", specifier = ">=1.6.0,<2" },
+    { name = "mkdocs-material", specifier = ">=9.5.0,<10" },
+    { name = "mkdocstrings", extras = ["python"], specifier = ">=1,<2" },
+    { name = "pytest", specifier = ">=9.0.2,<10" },
+    { name = "pytest-cov", specifier = ">=7.0.0,<8" },
+    { name = "ruff", specifier = ">=0.14.8,<1" },
 ]
 
 [[package]]
