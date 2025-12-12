@@ -29,7 +29,7 @@ dev = [
     "ruff>=0.14.8,<1",
     "mkdocs>=1.6.0,<2",
     "mkdocs-material>=9.5.0,<10",
-    "mkdocstrings[python]>=0.24.0,<1",
+    "mkdocstrings[python]>=1,<2",
 ]
 
 # Testing configuration
