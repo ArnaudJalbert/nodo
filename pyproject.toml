@@ -5,7 +5,7 @@ description = "Minimalist torrent download manager"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "requests>=2.31.0",
+    "requests>=2.31.0,<3",
 ]
 
 [project.scripts]
@@ -24,12 +24,12 @@ packages = ["src/nodo"]
 
 [dependency-groups]
 dev = [
-    "pytest>=9.0.2",
-    "pytest-cov>=7.0.0",
-    "ruff>=0.14.8",
-    "mkdocs>=1.6.0",
-    "mkdocs-material>=9.5.0",
-    "mkdocstrings[python]>=0.24.0",
+    "pytest>=9.0.2,<10",
+    "pytest-cov>=7.0.0,<8",
+    "ruff>=0.14.8,<1",
+    "mkdocs>=1.6.0,<2",
+    "mkdocs-material>=9.5.0,<10",
+    "mkdocstrings[python]>=0.24.0,<1",
 ]
 
 # Testing configuration
