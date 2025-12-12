@@ -4,22 +4,22 @@ from dataclasses import dataclass
 
 from nodo.application.dtos import TorrentSearchResultDTO
 from nodo.application.interfaces import (
-    IAggregatorServiceRegistry,
+    IndexerManager,
     IUserPreferencesRepository,
 )
 from nodo.domain.entities import TorrentSearchResult
 from nodo.domain.exceptions import (
-    AggregatorError,
-    AggregatorTimeoutError,
+    IndexerError,
+    IndexerTimeoutError,
     ValidationError,
 )
 
 
 class SearchTorrents:
-    """Use case for searching torrents across multiple aggregators.
+    """Use case for searching torrents via indexer manager.
 
-    Searches multiple aggregator services, combines results, deduplicates,
-    and returns sorted results.
+    Searches through a unified indexer manager interface, handles
+    results, and returns sorted results.
     """
 
     @dataclass(frozen=True, slots=True, kw_only=True)
@@ -28,26 +28,26 @@ class SearchTorrents:
 
         Attributes:
             query: Search query string.
-            aggregator_names: Optional list of aggregator names to search.
-                If None, uses favorite aggregators from preferences.
-                If provided, must contain at least one aggregator name.
-            max_results: Maximum number of results per aggregator.
+            indexer_names: Optional list of indexer names to search.
+                If None, uses favorite indexers from preferences.
+                If provided, must contain at least one indexer name.
+            max_results: Maximum number of results per indexer.
         """
 
         query: str
-        aggregator_names: list[str] | None = None
+        indexer_names: list[str] | None = None
         max_results: int = 10
 
     @dataclass(frozen=True, slots=True, kw_only=True)
     class FailedSearch:
-        """DTO for a failed aggregator search.
+        """DTO for a failed indexer search.
 
         Attributes:
-            aggregator_name: Name of the aggregator that failed.
+            indexer_name: Name of the indexer that failed.
             error_message: Error message from the failure.
         """
 
-        aggregator_name: str
+        indexer_name: str
         error_message: str
 
     @dataclass(frozen=True, slots=True, kw_only=True)
@@ -56,7 +56,7 @@ class SearchTorrents:
 
         Attributes:
             results: List of search result DTOs.
-            failed_searches: List of failed aggregator searches.
+            failed_searches: List of failed indexer searches.
         """
 
         results: tuple[TorrentSearchResultDTO, ...]
@@ -64,16 +64,16 @@ class SearchTorrents:
 
     def __init__(
         self,
-        aggregator_service_registry: IAggregatorServiceRegistry,
+        indexer_manager: IndexerManager,
         preferences_repository: IUserPreferencesRepository,
     ) -> None:
         """Initialize the use case.
 
         Args:
-            aggregator_service_registry: Registry for accessing aggregator services.
+            indexer_manager: Indexer manager for searching.
             preferences_repository: Repository for user preferences.
         """
-        self._aggregator_service_registry = aggregator_service_registry
+        self._indexer_manager = indexer_manager
         self._preferences_repository = preferences_repository
 
     def execute(self, input_data: Input) -> Output:
@@ -85,11 +85,10 @@ class SearchTorrents:
         Returns:
             Output containing search results.
 
-            Raises:
+        Raises:
             ValidationError: If query is empty or invalid.
-            AggregatorError: If all aggregators fail or no aggregators available.
-            Exception: Any non-AggregatorError/AggregatorTimeoutError exception from
-                aggregator services will propagate and fail the use case.
+            IndexerError: If search fails.
+            IndexerTimeoutError: If search times out.
         """
         # Validate query
         if not input_data.query or not input_data.query.strip():
@@ -101,110 +100,79 @@ class SearchTorrents:
         if input_data.max_results < 1:
             raise ValidationError("max_results must be at least 1")
 
-        # Validate aggregator_names if provided
-        if input_data.aggregator_names is not None:
-            if len(input_data.aggregator_names) == 0:
+        # Validate indexer_names if provided
+        if input_data.indexer_names is not None:
+            if len(input_data.indexer_names) == 0:
                 raise ValidationError(
-                    "aggregator_names must contain at least one aggregator name"
+                    "indexer_names must contain at least one indexer name"
                 )
 
-        # Determine which aggregators to use
-        aggregator_names = self._get_aggregator_names(input_data.aggregator_names)
+        # Determine which indexers to use
+        indexer_names = self._determine_indexers_to_search(input_data.indexer_names)
 
-        if not aggregator_names:
-            raise AggregatorError("No aggregators available for search")
+        if not indexer_names:
+            raise IndexerError("No indexers available for search")
 
-        # Validate that all provided aggregator names are valid
-        if input_data.aggregator_names is not None:
-            available_names = set(self._aggregator_service_registry.get_all_names())
-            invalid_aggregators = [
-                name
-                for name in input_data.aggregator_names
-                if name not in available_names
+        # Validate that all provided indexer names are valid
+        if input_data.indexer_names is not None:
+            available_names = set(self._indexer_manager.get_available_indexers())
+            invalid_indexers = [
+                name for name in input_data.indexer_names if name not in available_names
             ]
-            if invalid_aggregators:
+            if invalid_indexers:
                 valid_names = ", ".join(sorted(available_names))
                 raise ValidationError(
-                    f"Invalid aggregator names: {', '.join(invalid_aggregators)}. "
-                    f"Valid aggregators are: {valid_names}"
+                    f"Invalid indexer names: {', '.join(invalid_indexers)}. "
+                    f"Valid indexers are: {valid_names}"
                 )
 
-        # Search each aggregator and collect results
-        all_results: list[TorrentSearchResult] = []
-        successful_searches = 0
-        failed_searches: list[SearchTorrents.FailedSearch] = []
-
-        for aggregator_name in aggregator_names:
-            try:
-                service = self._aggregator_service_registry.get_service(aggregator_name)
-
-                results = service.search(query, max_results=input_data.max_results)
-                all_results.extend(results)
-
-                successful_searches += 1
-            except AggregatorTimeoutError as e:
-                # Track timeout error
-                failed_searches.append(
-                    SearchTorrents.FailedSearch(
-                        aggregator_name=aggregator_name,
-                        error_message=f"Search timed out: {e}",
-                    )
-                )
-                continue
-            except AggregatorError as e:
-                # Track failed aggregator
-                failed_searches.append(
-                    SearchTorrents.FailedSearch(
-                        aggregator_name=aggregator_name,
-                        error_message=f"Search failed: {e}",
-                    )
-                )
-                continue
-
-        # At least one aggregator must succeed
-        if successful_searches == 0:
-            raise AggregatorError(
-                f"All aggregators failed to search for query: {query}"
+        # Search via indexer manager
+        try:
+            results = self._indexer_manager.search(
+                query=query,
+                indexer_names=indexer_names,
+                max_results=input_data.max_results,
             )
-
-        # Deduplicate by magnet link using set (keeps first occurrence)
-        deduplicated_results = list(set(all_results))
+        except IndexerTimeoutError:
+            raise
+        except IndexerError:
+            raise
 
         # Sort by seeders (descending)
-        sorted_results = sorted(
-            deduplicated_results, key=lambda r: r.seeders, reverse=True
-        )
+        sorted_results = sorted(results, key=lambda r: r.seeders, reverse=True)
 
         # Convert to DTOs
         result_dtos = tuple(SearchTorrents._to_dto(result) for result in sorted_results)
-        failed_dtos = tuple(failed_searches)
+        failed_dtos = tuple()  # Indexer manager handles failures internally
 
         return SearchTorrents.Output(results=result_dtos, failed_searches=failed_dtos)
 
-    def _get_aggregator_names(self, provided_names: list[str] | None) -> list[str]:
-        """Get aggregator names from input or preferences.
+    def _determine_indexers_to_search(
+        self, provided_names: list[str] | None
+    ) -> list[str]:
+        """Determine which indexers to search.
 
         Args:
-            provided_names: Optional list of aggregator names from input.
-                If None, uses preferences or all available aggregators.
+            provided_names: Optional list of indexer names from input.
+                If None, uses preferences or all available indexers.
                 If provided, must contain at least one name (validated in execute).
 
         Returns:
-            List of aggregator names to search.
+            List of indexer names to search.
         """
         if provided_names is not None:
             return provided_names
 
         # Get from preferences
         preferences = self._preferences_repository.get()
-        favorite_aggregators = preferences.favorite_aggregators
+        favorite_indexers = preferences.favorite_indexers
 
         # If favorites exist, use them; otherwise use all available
-        if favorite_aggregators:
-            return [str(agg) for agg in favorite_aggregators]
+        if favorite_indexers:
+            return [str(idx) for idx in favorite_indexers]
 
-        # Return all available aggregator names
-        return self._aggregator_service_registry.get_all_names()
+        # Return all available indexer names
+        return self._indexer_manager.get_available_indexers()
 
     @staticmethod
     def _to_dto(result: TorrentSearchResult) -> TorrentSearchResultDTO:

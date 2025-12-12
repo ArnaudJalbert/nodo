@@ -17,7 +17,7 @@ class TorrentSearchResultDTO:
         size: Human-readable size string.
         seeders: Number of seeders.
         leechers: Number of leechers.
-        source: Which aggregator it came from.
+        source: Which indexer it came from.
         date_found: When this result was retrieved.
     """
 

@@ -16,7 +16,7 @@ class DownloadDTO:
         magnet_link: The magnet link URI.
         title: Name of the downloaded content.
         file_path: Local file system path.
-        source: Which aggregator it was downloaded from.
+        source: Which indexer it was downloaded from.
         status: Current status (DOWNLOADING, COMPLETED, FAILED, PAUSED).
         date_added: When the download was initiated.
         date_completed: When the download finished, None if not completed.

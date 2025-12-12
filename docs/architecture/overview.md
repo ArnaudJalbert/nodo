@@ -33,7 +33,7 @@ Nodo is built using **Clean Architecture** principles, which ensures separation 
 The **innermost layer** containing the core business logic.
 
 - **Entities**: Core business objects (`Download`, `TorrentSearchResult`, `UserPreferences`)
-- **Value Objects**: Immutable objects representing domain concepts (`MagnetLink`, `FileSize`, `DownloadStatus`, `AggregatorSource`)
+- **Value Objects**: Immutable objects representing domain concepts (`MagnetLink`, `FileSize`, `DownloadStatus`, `IndexerSource`)
 - **Exceptions**: Domain-specific exceptions
 - **No external dependencies**: Pure Python, standard library only
 
@@ -46,7 +46,7 @@ Contains application-specific business rules and use cases.
 - **Interfaces (ABCs)**: Abstract base classes defining contracts for external services
   - `IDownloadRepository` - Download persistence
   - `IUserPreferencesRepository` - Preferences persistence
-  - `IAggregatorService` - Torrent search service
+  - `IndexerManager` - Indexer manager services (e.g., Prowlarr)
   - `ITorrentClient` - Torrent client operations
 - **DTOs**: Data transfer objects for cross-layer communication
 - **Use Cases**: Application-specific business logic (to be implemented)
@@ -62,7 +62,8 @@ Implements the interfaces defined in the Application layer.
   - `SQLiteUserPreferencesRepository`
 - **Service Adapters**: Adapters for external services
   - `QBittorrentAdapter` - qBittorrent client integration
-  - Aggregator adapters (1337x, ThePirateBay, etc.)
+  - `ProwlarrIndexerManager` - Prowlarr indexer manager adapter
+  - `IProwlarrSource` - Protocol for Prowlarr API integration
 
 **Key Principle**: Implements Application layer interfaces, depends on Domain and Application layers.
 
@@ -74,6 +75,7 @@ The outermost layer containing framework and glue code.
 - **Dependency Injection**: Container setup and factory functions
 - **Configuration**: Configuration management (TOML/YAML)
 - **Database**: SQLAlchemy models and migrations
+- **Indexers**: Prowlarr adapter for indexer API integration
 
 **Key Principle**: Depends on all inner layers. Contains framework-specific code.
 

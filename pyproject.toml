@@ -4,7 +4,9 @@ version = "0.4.0"
 description = "Minimalist torrent download manager"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "requests>=2.31.0",
+]
 
 [project.scripts]
 nodo-docs = "nodo.infrastructure.documentation.main:main"
@@ -46,3 +48,16 @@ extend-select = [
     "I", # isort
 ]
 ignore = []
+
+# Coverage configuration
+[tool.coverage.run]
+omit = [
+    "src/nodo/infrastructure/documentation/main.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]

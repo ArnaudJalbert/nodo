@@ -24,7 +24,7 @@ Most infrastructure components (CLI, DI container, configuration) are pending im
 The CLI will be built using [Typer](https://typer.tiangolo.com/) and provides the user-facing interface.
 
 **Planned Commands:**
-- `search` - Search for torrents across aggregators
+- `search` - Search for torrents via Prowlarr indexer
 - `add` - Add a new download
 - `list` - List all downloads
 - `status` - Show download status

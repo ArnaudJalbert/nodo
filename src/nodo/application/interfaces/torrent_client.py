@@ -3,7 +3,7 @@
 from abc import ABC, abstractmethod
 
 from nodo.domain.entities import DownloadStatus
-from nodo.domain.value_objects import MagnetLink
+from nodo.domain.value_objects import TorrentLink
 
 
 class ITorrentClient(ABC):
@@ -14,11 +14,11 @@ class ITorrentClient(ABC):
     """
 
     @abstractmethod
-    def add_torrent(self, magnet_link: MagnetLink, download_path: str) -> str:
+    def add_torrent(self, magnet_link: TorrentLink, download_path: str) -> str:
         """Add a torrent to the client and start downloading.
 
         Args:
-            magnet_link: The magnet link of the torrent.
+            magnet_link: The torrent link (magnet URI or HTTP/HTTPS URL).
             download_path: The path where files should be downloaded.
 
         Returns:

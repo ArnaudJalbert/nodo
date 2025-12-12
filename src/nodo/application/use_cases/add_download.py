@@ -12,10 +12,10 @@ from nodo.domain.exceptions import (
     ValidationError,
 )
 from nodo.domain.value_objects import (
-    AggregatorSource,
     DownloadState,
     FileSize,
-    MagnetLink,
+    IndexerSource,
+    TorrentLink,
 )
 
 
@@ -33,7 +33,7 @@ class AddDownload:
         Attributes:
             magnet_link: The magnet link URI.
             title: Name of the downloaded content.
-            source: Which aggregator it was downloaded from.
+            source: Which indexer it was downloaded from.
             size: Human-readable size string (e.g., "1.5 GB").
             file_path: The file path where the download will be stored.
         """
@@ -83,8 +83,8 @@ class AddDownload:
             TorrentClientError: If starting download in client fails.
         """
         # Create value objects with validation
-        magnet_link = MagnetLink.from_string(input_data.magnet_link)
-        aggregator_source = AggregatorSource.from_string(input_data.source)
+        magnet_link = TorrentLink.from_string(input_data.magnet_link)
+        indexer_source = IndexerSource.from_string(input_data.source)
         file_size = FileSize.from_string(input_data.size)
         file_path = Path(input_data.file_path)
 
@@ -97,7 +97,7 @@ class AddDownload:
         # Check for duplicates
         if self._download_repository.exists_by_magnet_link(magnet_link):
             raise DuplicateDownloadError(
-                f"Download with magnet link already exists: {magnet_link.info_hash}"
+                f"Download with link already exists: {magnet_link}"
             )
 
         # Create Download entity
@@ -105,7 +105,7 @@ class AddDownload:
             magnet_link=magnet_link,
             title=title,
             file_path=file_path,
-            source=aggregator_source,
+            source=indexer_source,
             size=file_size,
         )
 

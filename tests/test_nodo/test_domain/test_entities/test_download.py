@@ -8,9 +8,9 @@ import pytest
 
 from nodo.domain.entities import Download
 from nodo.domain.value_objects import (
-    AggregatorSource,
     DownloadState,
     FileSize,
+    IndexerSource,
     MagnetLink,
 )
 
@@ -21,7 +21,7 @@ def test_download_create_with_required_fields() -> None:
         uri="magnet:?xt=urn:btih:1234567890abcdef1234567890abcdef12345678"
     )
     size = FileSize(bytes_=1024 * 1024 * 700)
-    source = AggregatorSource(name="1337x")
+    source = IndexerSource(name="Prowlarr")
     file_path = Path("/downloads/ubuntu.iso")
 
     download = Download(
@@ -49,7 +49,7 @@ def test_download_create_with_all_fields() -> None:
         uri="magnet:?xt=urn:btih:1234567890abcdef1234567890abcdef12345678"
     )
     size = FileSize(bytes_=1024 * 1024 * 700)
-    source = AggregatorSource(name="1337x")
+    source = IndexerSource(name="Prowlarr")
     file_path = Path("/downloads/ubuntu.iso")
     custom_id = uuid4()
     date_added = datetime(2025, 1, 15, 10, 0, 0)
@@ -81,7 +81,7 @@ def test_download_status_is_mutable() -> None:
         ),
         title="Test",
         file_path=Path("/downloads/test"),
-        source=AggregatorSource(name="1337x"),
+        source=IndexerSource(name="Prowlarr"),
         size=FileSize(bytes_=1024),
     )
 
@@ -98,7 +98,7 @@ def test_download_date_completed_is_mutable() -> None:
         ),
         title="Test",
         file_path=Path("/downloads/test"),
-        source=AggregatorSource(name="1337x"),
+        source=IndexerSource(name="Prowlarr"),
         size=FileSize(bytes_=1024),
     )
 
@@ -117,7 +117,7 @@ def test_download_requires_keyword_arguments() -> None:
             ),
             "Test",
             Path("/downloads/test"),
-            AggregatorSource(name="1337x"),
+            IndexerSource(name="Prowlarr"),
             FileSize(bytes_=1024),
         )
 
@@ -130,7 +130,7 @@ def test_download_each_instance_gets_unique_id() -> None:
         ),
         title="Test 1",
         file_path=Path("/downloads/test1"),
-        source=AggregatorSource(name="1337x"),
+        source=IndexerSource(name="Prowlarr"),
         size=FileSize(bytes_=1024),
     )
     download2 = Download(
@@ -139,7 +139,7 @@ def test_download_each_instance_gets_unique_id() -> None:
         ),
         title="Test 2",
         file_path=Path("/downloads/test2"),
-        source=AggregatorSource(name="1337x"),
+        source=IndexerSource(name="Prowlarr"),
         size=FileSize(bytes_=2048),
     )
 

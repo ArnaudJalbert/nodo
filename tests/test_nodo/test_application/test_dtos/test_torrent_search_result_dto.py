@@ -17,7 +17,7 @@ def test_torrent_search_result_dto_create_with_all_fields() -> None:
         size="1.40 GB",
         seeders=150,
         leechers=25,
-        source="1337x",
+        source="Prowlarr",
         date_found=date_found,
     )
 
@@ -29,7 +29,7 @@ def test_torrent_search_result_dto_create_with_all_fields() -> None:
     assert dto.size == "1.40 GB"
     assert dto.seeders == 150
     assert dto.leechers == 25
-    assert dto.source == "1337x"
+    assert dto.source == "Prowlarr"
     assert dto.date_found == date_found
 
 
@@ -61,7 +61,7 @@ def test_torrent_search_result_dto_is_frozen() -> None:
         size="1.40 GB",
         seeders=150,
         leechers=25,
-        source="1337x",
+        source="Prowlarr",
         date_found=date_found,
     )
 
@@ -79,7 +79,7 @@ def test_torrent_search_result_dto_equality() -> None:
         size="1.40 GB",
         seeders=150,
         leechers=25,
-        source="1337x",
+        source="Prowlarr",
         date_found=date_found,
     )
 
@@ -89,7 +89,7 @@ def test_torrent_search_result_dto_equality() -> None:
         size="1.40 GB",
         seeders=150,
         leechers=25,
-        source="1337x",
+        source="Prowlarr",
         date_found=date_found,
     )
 
@@ -107,7 +107,7 @@ def test_torrent_search_result_dto_different_values_not_equal() -> None:
         size="1.40 GB",
         seeders=150,
         leechers=25,
-        source="1337x",
+        source="Prowlarr",
         date_found=date_found,
     )
 
@@ -117,7 +117,7 @@ def test_torrent_search_result_dto_different_values_not_equal() -> None:
         size="1.40 GB",
         seeders=150,
         leechers=25,
-        source="1337x",
+        source="Prowlarr",
         date_found=date_found,
     )
 

@@ -1,195 +1,199 @@
 # Interface Adapters Layer
 
-The Interface Adapters layer implements the interfaces defined in the Application layer. It adapts data between the application's use cases and external systems like databases, APIs, and file systems.
+The Interface Adapters layer implements the interfaces defined in the Application layer. It adapts data between the application's use cases and external systems. This layer contains protocols that define boundaries between layers and concrete adapters that bridge them.
 
 ## Current Status
 
-**⏳ To Be Implemented** - This layer is currently empty (only contains `__init__.py`).
-
-The domain and application layers are complete, but the interface adapters that connect them to external systems are pending implementation.
+**✅ Implemented** - Core adapters for indexer and torrent client operations are complete.
 
 ## Principles
 
 - ✅ **Implements Application interfaces** - Concrete implementations of ABCs
+- ✅ **Defines protocols** - Protocols for external service boundaries
 - ✅ **Depends on Application and Domain** - Uses interfaces and entities
 - ✅ **Handles data transformation** - Converts between external formats and domain entities
 - ✅ **Isolated from Infrastructure** - Doesn't know about CLI or DI container
 
 ## Components
 
-### Repository Implementations
+### Indexer Manager Adapters
 
-**Status:** ⏳ To be implemented
+#### ProwlarrIndexerManager
 
-Repositories provide persistence for domain entities. They implement the repository interfaces defined in the Application layer.
+**Status:** ✅ Implemented
 
-#### SQLiteDownloadRepository
-
-**Planned:** SQLAlchemy-based implementation of `IDownloadRepository` using SQLite.
+Concrete implementation of `IndexerManager` that provides torrent search through Prowlarr.
 
 **Responsibilities:**
-- Map `Download` entities to database records
-- Handle CRUD operations
-- Convert between domain entities and database models
+- Wraps `IProwlarrSource` (raw Prowlarr API client)
+- Maps raw Prowlarr API responses to domain `TorrentSearchResult` entities
+- Validates and transforms data at the infrastructure boundary
+- Handles date parsing and field fallbacks
 
-**Location**: `src/nodo/interface_adapters/repositories/` (to be implemented)
+**Location**: `src/nodo/interface_adapters/adapters/prowlarr_indexer_manager.py`
 
-**Example Structure:**
+**Key Methods:**
 ```python
-class SQLiteDownloadRepository(IDownloadRepository):
-    def __init__(self, session: Session):
-        self._session = session
-    
-    def save(self, download: Download) -> None:
-        # Convert entity to ORM model
-        # Save to database
-        pass
-    
-    def find_by_id(self, id_: UUID) -> Download | None:
-        # Query database
-        # Convert ORM model to entity
-        pass
+def search(
+    query: str,
+    indexer_names: list[str] | None = None,
+    max_results: int = 10,
+) -> list[TorrentSearchResult]:
+    """Search for torrents and return domain entities"""
+
+def get_available_indexers(self) -> list[str]:
+    """Get list of available indexers from Prowlarr"""
 ```
 
-#### SQLiteUserPreferencesRepository
-
-**Planned:** SQLAlchemy-based implementation of `IUserPreferencesRepository` using SQLite.
-
-**Responsibilities:**
-- Persist `UserPreferences` singleton
-- Handle default preferences creation
-
-**Location**: `src/nodo/interface_adapters/repositories/` (to be implemented)
-
-### Service Adapters
-
-**Status:** ⏳ To be implemented
-
-Service adapters implement interfaces for external services.
-
-#### QBittorrentAdapter
-
-**Planned:** Adapter for qBittorrent Web API, implementing `ITorrentClient`.
-
-**Responsibilities:**
-- Communicate with qBittorrent via HTTP API
-- Map qBittorrent responses to domain value objects
-- Handle authentication and error cases
-
-**Location**: `src/nodo/interface_adapters/services/` (to be implemented)
-
-**Example Structure:**
-```python
-class QBittorrentAdapter(ITorrentClient):
-    def __init__(self, base_url: str, username: str, password: str):
-        self._client = QBittorrentClient(base_url, username, password)
-    
-    def add_torrent(self, magnet_link: MagnetLink, download_path: str) -> str:
-        # Call qBittorrent API
-        # Return torrent hash
-        pass
-    
-    def get_status(self, torrent_hash: str) -> DownloadStatus | None:
-        # Query qBittorrent API
-        # Convert to DownloadStatus entity
-        pass
+**Data Transformation:**
+```
+Prowlarr API JSON → Raw dict → TorrentSearchResult entities
+       (raw)              (mapping)         (domain)
 ```
 
-#### Aggregator Adapters
+### Protocols
 
-**Planned:** Adapters for various torrent aggregator websites, implementing `IAggregatorService`.
+#### IProwlarrSource
 
-**Base Adapter:**
-- `AggregatorAdapter` - Base class with common functionality (to be implemented)
+**Status:** ✅ Implemented
 
-**Specific Implementations:**
-- `The1337xAdapter` - 1337x aggregator (to be implemented)
-- `ThePirateBayAdapter` - ThePirateBay aggregator (to be implemented)
-- (More aggregators as needed)
+Protocol defining the interface for Prowlarr source services that return raw data.
 
 **Responsibilities:**
-- Scrape or use APIs from aggregator websites
-- Parse HTML/JSON responses
-- Convert to `TorrentSearchResult` entities
-- Handle rate limiting and errors
+- Define contract for Prowlarr API clients
+- Specify raw data interface (returns `list[dict[str, Any]]`)
+- Serve as boundary between infrastructure (HTTP) and application (domain entities)
 
-**Location**: `src/nodo/interface_adapters/services/aggregators/` (to be implemented)
+**Location**: `src/nodo/interface_adapters/protocols/prowlarr_source_protocol.py`
 
-## Data Transformation
+**Methods:**
+```python
+def search(
+    query: str,
+    indexer_names: list[str] | None = None,
+    max_results: int = 10,
+) -> list[dict[str, Any]]:
+    """Search for torrents, returning raw API responses"""
 
-Interface adapters are responsible for converting between:
+def get_available_indexers(self) -> list[str]:
+    """Get list of available indexers"""
+```
 
-1. **Domain entities** ↔ **Database models** (repositories)
-2. **Domain entities** ↔ **External API formats** (service adapters)
-3. **Domain value objects** ↔ **External representations**
+**Raises:**
+- `IndexerError` - If the search fails
+- `IndexerTimeoutError` - If the search times out
 
-### Example: Entity to Database Model
+## Data Transformation Examples
+
+### Prowlarr Raw Data → Domain Entity
 
 ```python
-def _to_orm_model(self, download: Download) -> DownloadModel:
-    return DownloadModel(
-        id=str(download.id_),
-        magnet_link=str(download.magnet_link),
-        title=download.title,
-        file_path=str(download.file_path),
-        source=str(download.source),
-        status=download.status.value,
-        size_bytes=download.size.bytes,
-        date_added=download.date_added,
-        date_completed=download.date_completed
-    )
+# Raw response from Prowlarr API
+raw_result = {
+    "magnetUrl": "magnet:?xt=urn:btih:...",
+    "title": "Ubuntu 24.04",
+    "size": 3221225472,
+    "seeders": 150,
+    "leechers": 25,
+    "indexer": "1337x",
+    "publishDate": "2025-06-15T14:30:45Z"
+}
 
-def _to_entity(self, model: DownloadModel) -> Download:
-    return Download(
-        id_=UUID(model.id),
-        magnet_link=MagnetLink(model.magnet_link),
-        title=model.title,
-        file_path=Path(model.file_path),
-        source=AggregatorSource(model.source),
-        status=DownloadState(model.status),
-        size=FileSize(model.size_bytes),
-        date_added=model.date_added,
-        date_completed=model.date_completed
-    )
+# Transformed to domain entity
+result = TorrentSearchResult(
+    magnet_link=MagnetLink.from_string("magnet:?xt=urn:btih:..."),
+    title="Ubuntu 24.04",
+    size=FileSize(bytes_=3221225472),
+    seeders=150,
+    leechers=25,
+    source=IndexerSource.from_string("1337x"),  # Normalized to canonical form
+    date_found=datetime(2025, 6, 15, 14, 30, 45, tzinfo=timezone.utc)
+)
 ```
 
 ## Error Handling
 
 Interface adapters should:
 
-- Catch external system errors
+- Catch external system errors (network, timeouts, invalid responses)
 - Convert to domain exceptions when appropriate
-- Handle network timeouts, connection errors, etc.
+- Handle missing or malformed fields with sensible defaults
+- Skip malformed results while processing valid ones
 - Provide meaningful error messages
+
+**Example:**
+```python
+try:
+    response = self._indexer_source.search(query, indexer_names, max_results)
+except requests.Timeout:
+    raise IndexerTimeoutError(f"Prowlarr search timed out after {timeout}s")
+except requests.RequestException as e:
+    raise IndexerError(f"Prowlarr API request failed: {e}")
+```
 
 ## Testing
 
-Interface adapters can be tested with:
+Interface adapters are tested with:
 
-- **Integration tests** - Against real databases/APIs (in test environments)
-- **Unit tests** - With mocked external dependencies
-- **Contract tests** - Verify interface compliance
+- **Unit tests** - Mocked external dependencies (e.g., mocked Prowlarr adapter)
+- **Integration tests** - Against real external services in test environments
+- **Data transformation tests** - Verify correct mapping of raw data to domain entities
 
-## Protocols
+**Example Test:**
+```python
+def test_prowlarr_index_manager_maps_raw_to_entities():
+    mock_source = Mock(spec=IProwlarrSource)
+    mock_source.search.return_value = [
+        {
+            "magnetUrl": "magnet:?xt=urn:btih:...",
+            "title": "Test",
+            "size": 1024,
+            "seeders": 50,
+            "leechers": 5,
+            "indexer": "Prowlarr",
+            "publishDate": "2025-01-01T12:00:00Z"
+        }
+    ]
 
-**Status:** ⏳ To be implemented
+    adapter = ProwlarrIndexerManager(indexer_source=mock_source)
+    results = adapter.search(query="test")
 
-Protocols define structural typing for dependencies:
+    assert isinstance(results[0], TorrentSearchResult)
+    assert results[0].title == "Test"
+```
 
-- `SQLAlchemySessionProtocol` - Database session protocol (to be implemented)
-- `QBittorrentClientProtocol` - qBittorrent API protocol (to be implemented)
+## Future Extensibility
 
-**Location**: `src/nodo/interface_adapters/protocols/` (to be implemented)
+The architecture supports adding more indexer managers:
+
+1. **Create new protocol** - `IJackettSource` in `protocols/`
+2. **Implement adapter** - `JackettIndexerManager` in `adapters/`
+3. **Register in DI** - Configure in infrastructure layer
+
+This maintains the separation of concerns while allowing different indexer implementations.
 
 ## Current Project Structure
 
 ```
 src/nodo/interface_adapters/
-└── __init__.py  # Currently empty
+├── __init__.py
+├── adapters/
+│   ├── __init__.py
+│   └── prowlarr_indexer_manager.py  # ProwlarrIndexerManager
+├── protocols/
+│   ├── __init__.py
+│   └── prowlarr_source_protocol.py  # IProwlarrSource
 ```
 
-## Next Steps
+## Key Design Decisions
 
+1. **Separate protocols for raw data** - `IProwlarrSource` handles infrastructure boundary
+2. **Adapter pattern** - `ProwlarrIndexerManager` provides domain-level interface
+3. **Lazy transformation** - Only transform data when creating domain entities
+4. **Fault tolerance** - Skip malformed results rather than fail entire search
+
+## Related Documentation
+
+- [Application Layer](application.md) - See `IndexerManager` interface
+- [Domain Layer](domain.md) - See `TorrentSearchResult` entity
 - [Infrastructure](infrastructure.md) - See how adapters are wired together
-- [Application Layer](application.md) - Review the interfaces being implemented
-

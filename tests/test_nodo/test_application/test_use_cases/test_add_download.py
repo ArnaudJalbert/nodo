@@ -17,9 +17,9 @@ from nodo.domain.exceptions import (
     ValidationError,
 )
 from nodo.domain.value_objects import (
-    AggregatorSource,
     DownloadState,
     FileSize,
+    IndexerSource,
     MagnetLink,
 )
 
@@ -28,7 +28,7 @@ def test_add_download_success() -> None:
     """Should successfully add a download."""
     magnet_link_str = "magnet:?xt=urn:btih:" + "a" * 40
     title = "Test Download"
-    source = "1337x"
+    source = "Prowlarr"
     size = "1.5 GB"
     file_path = "/downloads/test_download"
 
@@ -84,7 +84,7 @@ def test_add_download_uses_provided_file_path() -> None:
     input_data = AddDownload.Input(
         magnet_link=magnet_link_str,
         title="Test",
-        source="1337x",
+        source="Prowlarr",
         size="1 GB",
         file_path=file_path,
     )
@@ -114,7 +114,7 @@ def test_add_download_raises_error_for_duplicate() -> None:
     input_data = AddDownload.Input(
         magnet_link=magnet_link_str,
         title="Test",
-        source="1337x",
+        source="Prowlarr",
         size="1 GB",
         file_path="/downloads/test",
     )
@@ -140,7 +140,7 @@ def test_add_download_raises_error_for_empty_title() -> None:
     input_data = AddDownload.Input(
         magnet_link="magnet:?xt=urn:btih:" + "a" * 40,
         title="",
-        source="1337x",
+        source="Prowlarr",
         size="1 GB",
         file_path="/downloads/test",
     )
@@ -165,7 +165,7 @@ def test_add_download_raises_error_for_invalid_magnet_link() -> None:
     input_data = AddDownload.Input(
         magnet_link="invalid_magnet_link",
         title="Test",
-        source="1337x",
+        source="Prowlarr",
         size="1 GB",
         file_path="/downloads/test",
     )
@@ -189,7 +189,7 @@ def test_add_download_raises_error_for_invalid_size() -> None:
     input_data = AddDownload.Input(
         magnet_link="magnet:?xt=urn:btih:" + "a" * 40,
         title="Test",
-        source="1337x",
+        source="Prowlarr",
         size="invalid_size",
         file_path="/downloads/test",
     )
@@ -226,7 +226,7 @@ def test_add_download_raises_error_for_invalid_source() -> None:
         use_case.execute(input_data)
 
     assert (
-        "aggregator" in str(exc_info.value).lower()
+        "indexer" in str(exc_info.value).lower()
         or "source" in str(exc_info.value).lower()
     )
 
@@ -257,7 +257,7 @@ def test_add_download_raises_error_for_torrent_client_failure() -> None:
     input_data = AddDownload.Input(
         magnet_link=magnet_link_str,
         title="Test",
-        source="1337x",
+        source="Prowlarr",
         size="1 GB",
         file_path="/downloads/test",
     )
@@ -300,7 +300,7 @@ def test_add_download_sets_status_to_failed_on_torrent_client_error() -> None:
     input_data = AddDownload.Input(
         magnet_link=magnet_link_str,
         title="Test Download",
-        source="1337x",
+        source="Prowlarr",
         size="1 GB",
         file_path="/downloads/test",
     )
@@ -335,7 +335,7 @@ def test_to_dto_converts_correctly() -> None:
     download_id = uuid4()
     magnet_link = MagnetLink.from_string("magnet:?xt=urn:btih:" + "a" * 40)
     file_path = Path("/downloads/test")
-    source = AggregatorSource.from_string("1337x")
+    source = IndexerSource.from_string("Prowlarr")
     size = FileSize.from_bytes(1024 * 1024)
 
     download = Download(

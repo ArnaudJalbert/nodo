@@ -8,7 +8,7 @@ import pytest
 
 from nodo.domain.entities import USER_PREFERENCES_ID, UserPreferences
 from nodo.domain.exceptions import ValidationError
-from nodo.domain.value_objects import AggregatorSource
+from nodo.domain.value_objects import IndexerSource
 
 # --- Creation ---
 
@@ -20,7 +20,7 @@ def test_user_preferences_create_with_default_path() -> None:
     assert prefs.default_download_path == Path("/downloads")
     assert prefs.id_ == USER_PREFERENCES_ID
     assert prefs.favorite_paths == []
-    assert prefs.favorite_aggregators == []
+    assert prefs.favorite_indexers == []
     assert prefs.max_concurrent_downloads == 3
     assert prefs.auto_start_downloads is True
     assert isinstance(prefs.date_created, datetime)
@@ -40,12 +40,12 @@ def test_user_preferences_create_with_all_fields() -> None:
     date_created = datetime(2025, 1, 1)
     date_modified = datetime(2025, 1, 15)
     favorite_paths = [Path("/movies"), Path("/music")]
-    favorite_aggregators = [AggregatorSource(name="1337x")]
+    favorite_indexers = [IndexerSource(name="Prowlarr")]
 
     prefs = UserPreferences(
         default_download_path=Path("/downloads"),
         favorite_paths=favorite_paths,
-        favorite_aggregators=favorite_aggregators,
+        favorite_indexers=favorite_indexers,
         max_concurrent_downloads=5,
         auto_start_downloads=False,
         date_created=date_created,
@@ -53,7 +53,7 @@ def test_user_preferences_create_with_all_fields() -> None:
     )
 
     assert prefs.favorite_paths == favorite_paths
-    assert prefs.favorite_aggregators == favorite_aggregators
+    assert prefs.favorite_indexers == favorite_indexers
     assert prefs.max_concurrent_downloads == 5
     assert prefs.auto_start_downloads is False
     assert prefs.date_created == date_created
@@ -153,22 +153,22 @@ def test_user_preferences_remove_nonexistent_path_no_error() -> None:
 # --- Favorite Aggregators ---
 
 
-def test_user_preferences_add_favorite_aggregator() -> None:
+def test_user_preferences_add_favorite_indexer() -> None:
     """Should add aggregator to favorites."""
     prefs = UserPreferences(default_download_path=Path("/downloads"))
-    source = AggregatorSource(name="1337x")
-    prefs.add_favorite_aggregator(source)
+    source = IndexerSource(name="Prowlarr")
+    prefs.add_favorite_indexer(source)
 
-    assert source in prefs.favorite_aggregators
+    assert source in prefs.favorite_indexers
 
 
-def test_user_preferences_add_favorite_aggregator_updates_date_modified() -> None:
+def test_user_preferences_add_favorite_indexer_updates_date_modified() -> None:
     """Adding favorite aggregator should update date_modified."""
     prefs = UserPreferences(default_download_path=Path("/downloads"))
     original_modified = prefs.date_modified
     sleep(0.01)
 
-    prefs.add_favorite_aggregator(AggregatorSource(name="1337x"))
+    prefs.add_favorite_indexer(IndexerSource(name="Prowlarr"))
 
     assert prefs.date_modified > original_modified
 
@@ -176,35 +176,35 @@ def test_user_preferences_add_favorite_aggregator_updates_date_modified() -> Non
 def test_user_preferences_add_duplicate_favorite_aggregator_no_effect() -> None:
     """Adding duplicate aggregator should not add it again."""
     prefs = UserPreferences(default_download_path=Path("/downloads"))
-    source = AggregatorSource(name="1337x")
-    prefs.add_favorite_aggregator(source)
+    source = IndexerSource(name="Prowlarr")
+    prefs.add_favorite_indexer(source)
     original_modified = prefs.date_modified
     sleep(0.01)
-    prefs.add_favorite_aggregator(source)
+    prefs.add_favorite_indexer(source)
 
-    assert len([a for a in prefs.favorite_aggregators if a == source]) == 1
+    assert len([a for a in prefs.favorite_indexers if a == source]) == 1
     assert prefs.date_modified == original_modified
 
 
-def test_user_preferences_remove_favorite_aggregator() -> None:
+def test_user_preferences_remove_favorite_indexer() -> None:
     """Should remove aggregator from favorites."""
     prefs = UserPreferences(default_download_path=Path("/downloads"))
-    source = AggregatorSource(name="1337x")
-    prefs.add_favorite_aggregator(source)
-    prefs.remove_favorite_aggregator(source)
+    source = IndexerSource(name="Prowlarr")
+    prefs.add_favorite_indexer(source)
+    prefs.remove_favorite_indexer(source)
 
-    assert source not in prefs.favorite_aggregators
+    assert source not in prefs.favorite_indexers
 
 
-def test_user_preferences_remove_favorite_aggregator_updates_date_modified() -> None:
+def test_user_preferences_remove_favorite_indexer_updates_date_modified() -> None:
     """Removing favorite aggregator should update date_modified."""
     prefs = UserPreferences(default_download_path=Path("/downloads"))
-    source = AggregatorSource(name="1337x")
-    prefs.add_favorite_aggregator(source)
+    source = IndexerSource(name="Prowlarr")
+    prefs.add_favorite_indexer(source)
     original_modified = prefs.date_modified
     sleep(0.01)
 
-    prefs.remove_favorite_aggregator(source)
+    prefs.remove_favorite_indexer(source)
 
     assert prefs.date_modified > original_modified
 
@@ -215,7 +215,7 @@ def test_user_preferences_remove_nonexistent_favorite_aggregator_no_effect() -> 
     original_modified = prefs.date_modified
     sleep(0.01)
 
-    prefs.remove_favorite_aggregator(AggregatorSource(name="1337x"))
+    prefs.remove_favorite_indexer(IndexerSource(name="Prowlarr"))
 
     assert prefs.date_modified == original_modified
 
